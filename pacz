@@ -10,7 +10,6 @@ bad_usage()
     printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
     printf 'Providers: inpost\n' >&2
     exit 1
-
 }
 [ $# -eq 2 ] || bad_usage
 provider="$1"
