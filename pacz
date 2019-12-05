@@ -16,7 +16,10 @@ provider="$1"
 ident="$2"
 urlget()
 {
-    curl --silent --fail --show-error "$@"
+    curl \
+        --user-agent 'pacz (https://github.com/jwilk/pacz)' \
+        --silent --fail --show-error \
+        "$@"
 }
 case $provider in
     inpost)
