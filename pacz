@@ -14,16 +14,20 @@ bad_usage()
 [ $# -eq 2 ] || bad_usage
 provider="$1"
 ident="$2"
+urlget()
+{
+    curl --silent --fail --show-error "$@"
+}
 case $provider in
     inpost)
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
-        json=$(curl --silent --fail --show-error "$url")
+        json=$(urlget "$url")
         jq . <<< "$json"
         ;;
     paczkawruchu)
         ts=$(date '+%s000')
         url="https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts"
-        json=$(curl --silent --fail --show-error "$url")
+        json=$(urlget "$url")
         json=${json#callback(}
         json=${json%);}
         jq . <<< "$json"
