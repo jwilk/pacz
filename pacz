@@ -8,7 +8,7 @@ prog=${0##*/}
 bad_usage()
 {
     printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
-    printf 'Providers: inpost\n' >&2
+    printf 'Providers: inpost paczkawruchu\n' >&2
     exit 1
 }
 [ $# -eq 2 ] || bad_usage
@@ -18,6 +18,14 @@ case $provider in
     inpost)
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
         json=$(curl --silent --fail --show-error "$url")
+        jq . <<< "$json"
+        ;;
+    paczkawruchu)
+        ts=$(date '+%s000')
+        url="https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts"
+        json=$(curl --silent --fail --show-error "$url")
+        json=${json#callback(}
+        json=${json%);}
         jq . <<< "$json"
         ;;
     *)
