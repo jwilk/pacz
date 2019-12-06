@@ -33,7 +33,7 @@ case $provider in
         json=$(urlget "$url")
         json=${json#callback(}
         json=${json%);}
-        jq . <<< "$json"
+        jq 'del(.historyHtml, .full)' <<< "$json"
         ;;
     *)
         bad_usage;;
