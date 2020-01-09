@@ -8,7 +8,7 @@ prog=${0##*/}
 bad_usage()
 {
     printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
-    printf 'Providers: inpost paczkawruchu\n' >&2
+    printf 'Providers: inpost paczkawruchu poczta-polska\n' >&2
     exit 1
 }
 [ $# -eq 2 ] || bad_usage
@@ -34,6 +34,27 @@ case $provider in
         json=${json#callback(}
         json=${json%);}
         jq 'del(.historyHtml, .full)' <<< "$json"
+        ;;
+    poczta-polska)
+        tmpdir=$(mktemp -d -t pacz.XXXXXX)
+        url="https://emonitoring.poczta-polska.pl"
+        cookiejar="$tmpdir/cookies"
+        urlget -c "$cookiejar" "$url" > /dev/null
+        sid=$(grep -w PHPSESSID "$cookiejar" | cut -f 7)
+        html=$(urlget -b "$cookiejar" -e "$url/" -d "s=$sid" -d "n=$ident" -d 'l=' "$url/wssClient.php")
+        perl -0777 <<< "$html" -e '
+            $_ = <STDIN>;
+            m{<table\b[^>]*>(.*?)</table>};
+            $_ = $1;
+            s{<a\b[^>]*>(.*?)</a>}{$1}g;
+            s{<tr\b[^>]*>}{\n}g;
+            s{<t[dh]\b[^>]*>}{ | }g;
+            s{^ [|] }{}mg;
+            s{</t[hdr]>}{}g;
+            s{  *}{ }g;
+            print "$_\n";
+        '
+        rm -rf "$tmpdir"
         ;;
     *)
         bad_usage;;
