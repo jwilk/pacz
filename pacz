@@ -52,6 +52,7 @@ case $provider in
             s{^ [|] }{}mg;
             s{</t[hdr]>}{}g;
             s{  *}{ }g;
+            s{^\s}{};
             print "$_\n";
         '
         rm -rf "$tmpdir"
