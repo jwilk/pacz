@@ -14,20 +14,35 @@ bad_usage()
 [ $# -eq 2 ] || bad_usage
 provider="$1"
 ident="$2"
+
+curlopts=()
 urlget()
 {
     curl \
+        "${curlopts[@]}" \
         --user-agent 'pacz (https://github.com/jwilk/pacz)' \
         --silent --fail --show-error \
         "$@"
 }
+useca()
+{
+    local cadir='/usr/share/ca-certificates/mozilla'
+    local cafile="$cadir/${1}.crt"
+    if [ -d "$cadir" ]
+    then
+        curlopts+=(--cacert "$cafile" --capath /nonexistent)
+    fi
+}
+
 case $provider in
     inpost)
+        useca 'DigiCert_Global_Root_CA'
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
         json=$(urlget "$url")
         jq . <<< "$json"
         ;;
     paczkawruchu)
+        useca 'DigiCert_Global_Root_G2'
         ts=$(date '+%s000')
         url="https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts"
         json=$(urlget "$url")
@@ -36,6 +51,7 @@ case $provider in
         jq 'del(.historyHtml, .full)' <<< "$json"
         ;;
     poczta-polska)
+        useca 'Certum_Trusted_Network_CA'
         tmpdir=$(mktemp -d -t pacz.XXXXXX)
         url="https://emonitoring.poczta-polska.pl"
         cookiejar="$tmpdir/cookies"
