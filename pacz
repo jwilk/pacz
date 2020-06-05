@@ -70,7 +70,10 @@ case $provider in
             s{^ [|] }{}mg;
             s{</t[hdr]>}{}g;
             s{  *}{ }g;
-            s{^\s}{};
+            s{ *[|] *$}{ }mg;
+            s{^\s+}{}mg;
+            s{\n\n+}{\n}g;
+            s{\n\z}{};
             print "$_\n";
         '
         rm -rf "$tmpdir"
