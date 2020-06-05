@@ -59,6 +59,8 @@ case $provider in
         sid=$(grep -w PHPSESSID "$cookiejar" | cut -f 7)
         html=$(urlget -b "$cookiejar" -e "$url/" -d "s=$sid" -d "n=$ident" -d 'l=' "$url/wssClient.php")
         perl -0777 <<< "$html" -e '
+            use strict;
+            use warnings;
             $_ = <STDIN>;
             m{<table\b[^>]*>(.*?)</table>};
             $_ = $1;
