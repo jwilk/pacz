@@ -50,7 +50,7 @@ case $provider in
         json=${json%);}
         jq 'del(.historyHtml, .full)' <<< "$json"
         ;;
-    poczta-polska)
+    poczta|poczta-polska)
         useca 'Certum_Trusted_Network_CA'
         tmpdir=$(mktemp -d -t pacz.XXXXXX)
         url="https://emonitoring.poczta-polska.pl"
