@@ -62,8 +62,9 @@ case $provider in
             use strict;
             use warnings;
             $_ = <STDIN>;
-            m{<table\b[^>]*>(.*?)</table>}s;
-            $_ = $1;
+            my @tables;
+            s{<table\b[^>]*>(.*?)</table>}{push @tables, $1}sge;
+            $_ = "@tables";
             s{<a\b[^>]*>(.*?)</a>}{$1}sg;
             s{<tr\b[^>]*>}{\n}g;
             s{<t[dh]\b[^>]*>}{ | }g;
