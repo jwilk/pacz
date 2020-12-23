@@ -8,7 +8,7 @@ prog=${0##*/}
 bad_usage()
 {
     printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
-    printf 'Providers: inpost paczkawruchu poczta-polska\n' >&2
+    printf 'Providers: inpost paczkawruchu poczta-polska gls\n' >&2
     exit 1
 }
 [ $# -eq 2 ] || bad_usage
@@ -78,6 +78,13 @@ case $provider in
             print "$_\n";
         '
         rm -rf "$tmpdir"
+        ;;
+    gls)
+        useca 'GlobalSign_Root_CA'
+        ts=$(date '+%s000')
+        url="https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts"
+        json=$(urlget "$url")
+        jq '.tuStatus[0] | del(.progressBar)' <<< "$json"
         ;;
     *)
         bad_usage;;
