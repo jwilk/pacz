@@ -58,10 +58,19 @@ case $provider in
         urlget -c "$cookiejar" "$url" > /dev/null
         sid=$(grep -w PHPSESSID "$cookiejar" | cut -f 7)
         html=$(urlget -b "$cookiejar" -e "$url/" -d "s=$sid" -d "n=$ident" -d 'l=' "$url/wssClient.php")
+        xc=0
+        case $html in
+            *' Brak danych o tej przesyłce '*)
+                printf 'emonitoring.poczta-polska.pl: no data for %s\n' "$ident" >&2
+                html=''
+                xc=1
+            ;;
+        esac
         perl -0777 <<< "$html" -e '
             use strict;
             use warnings;
             $_ = <STDIN>;
+            exit if $_ eq "\n";
             my @tables;
             s{<table\b[^>]*>(.*?)</table>}{push @tables, $1}sge;
             $_ = "@tables";
@@ -78,6 +87,7 @@ case $provider in
             print "$_\n";
         '
         rm -rf "$tmpdir"
+        exit $xc
         ;;
     gls)
         useca 'GlobalSign_Root_CA'
