@@ -1,0 +1,7 @@
+.. code:: console
+
+   $ pacz --help
+   Usage: pacz PROVIDER IDENT
+   Providers: inpost gls paczkawruchu poczta-polska
+
+.. vim:ts=3 sts=3 sw=3 et ft=rst
