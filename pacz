@@ -82,6 +82,7 @@ case $provider in
             s{  *}{ }g;
             s{ *[|] *$}{ }mg;
             s{^\s+}{}mg;
+            s{\s+$}{}mg;
             s{\n\n+}{\n}g;
             s{\n\z}{};
             print "$_\n";
