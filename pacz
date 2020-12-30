@@ -8,7 +8,7 @@ prog=${0##*/}
 bad_usage()
 {
     printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
-    printf 'Providers: inpost paczkawruchu poczta-polska gls\n' >&2
+    printf 'Providers: inpost gls paczkawruchu poczta-polska\n' >&2
     exit 1
 }
 [ $# -eq 2 ] || bad_usage
