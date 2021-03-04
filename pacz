@@ -65,6 +65,7 @@ case $provider in
         useca 'DigiCert_Global_Root_CA'
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
         json=$(urlget "$url")
+        json=$(jq 'del(.tracking_details[].agency | nulls)' <<< "$json")
         json2yaml <<< "$json"
         ;;
     paczkawruchu)
