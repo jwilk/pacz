@@ -34,12 +34,38 @@ useca()
     fi
 }
 
+json2yaml()
+{
+    perl -m-lib=. -0777 -e '
+        use strict;
+        use warnings;
+        use JSON::PP;
+        $_ = <STDIN>;
+        my $jp = JSON::PP->new->utf8->pretty;
+        $_ = $jp->decode($_);
+        my $use_yaml = 0;
+        eval {
+            require YAML::XS;
+            $use_yaml = 1;
+        };
+        if ($use_yaml) {
+            no warnings "once";
+            local $YAML::XS::Boolean = "JSON::PP";
+            $_ = YAML::XS::Dump($_);
+            s/^---\n//;
+        } else {
+            $_ = $jp->encode($_);
+        }
+        print $_;
+    '
+}
+
 case $provider in
     inpost)
         useca 'DigiCert_Global_Root_CA'
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
         json=$(urlget "$url")
-        jq . <<< "$json"
+        json2yaml <<< "$json"
         ;;
     paczkawruchu)
         useca 'DigiCert_Global_Root_G2'
@@ -48,7 +74,8 @@ case $provider in
         json=$(urlget "$url")
         json=${json#callback(}
         json=${json%);}
-        jq 'del(.historyHtml, .full)' <<< "$json"
+        json=$(jq 'del(.historyHtml, .full)' <<< "$json")
+        json2yaml <<< "$json"
         ;;
     poczta|poczta-polska)
         useca 'Certum_Trusted_Network_CA'
@@ -95,7 +122,8 @@ case $provider in
         ts=$(date '+%s000')
         url="https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts"
         json=$(urlget "$url")
-        jq '.tuStatus[0] | del(.progressBar)' <<< "$json"
+        json=$(jq '.tuStatus[0] | del(.progressBar)' <<< "$json")
+        json2yaml <<< "$json"
         ;;
     *)
         bad_usage;;
