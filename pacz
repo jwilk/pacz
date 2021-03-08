@@ -66,6 +66,7 @@ case $provider in
         url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
         json=$(urlget "$url")
         json=$(jq 'del(.tracking_details[].agency | nulls)' <<< "$json")
+        json=${json//'&amp;'/&}
         json2yaml <<< "$json"
         ;;
     paczkawruchu)
