@@ -67,7 +67,7 @@ sub dump_yaml
         $use_yaml = 0;
     };
     if ($use_yaml) {
-        no warnings 'once';
+        no warnings 'once';  ## no critic (ProhibitNoWarnings)
         local $YAML::XS::Boolean = 'JSON::PP';
         $_ = YAML::XS::Dump($_);
         s/^---\n//;
