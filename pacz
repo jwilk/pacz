@@ -60,10 +60,11 @@ sub urlget
 sub dump_yaml
 {
     local ($_) = @_;
-    my $use_yaml = 0;
+    my $use_yaml = 1;
     eval {
         require YAML::XS;
-        $use_yaml = 1;
+    } or do {
+        $use_yaml = 0;
     };
     if ($use_yaml) {
         no warnings 'once';
