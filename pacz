@@ -1,134 +1,191 @@
-#!/usr/bin/env bash
+#!/usr/bin/env perl
 
 # Copyright © 2019-2021 Jakub Wilk <jwilk@jwilk.net>
 # SPDX-License-Identifier: MIT
 
-set -e -u
-prog=${0##*/}
-bad_usage()
-{
-    printf 'Usage: %s PROVIDER IDENT\n' "$prog" >&2
-    printf 'Providers: inpost gls paczkawruchu poczta-polska\n' >&2
-    exit 1
-}
-[ $# -eq 2 ] || bad_usage
-provider="$1"
-ident="$2"
+no lib '.';  # CVE-2016-1238
 
-curlopts=()
-urlget()
+use strict;
+use warnings;
+use v5.14;
+
+use English qw(-no_match_vars);
+use HTTP::Tiny;
+use JSON::PP;
+use Time::Piece;
+
+use HTTP::CookieJar;
+
+my $prog = $PROGRAM_NAME =~ s{.*/}{}r;
+
+my $cookie_jar = HTTP::CookieJar->new;
+my %http_options = (
+    agent => 'pacz (https://github.com/jwilk/pacz)',
+    cookie_jar => $cookie_jar,
+    verify_SSL => 1,
+);
+my $http = HTTP::Tiny->new(%http_options);
+
+my $jp = JSON::PP->new->utf8->pretty;
+
+sub useca
 {
-    curl \
-        "${curlopts[@]}" \
-        --user-agent 'pacz (https://github.com/jwilk/pacz)' \
-        --silent --fail --show-error \
-        "$@"
-}
-useca()
-{
-    local cadir='/usr/share/ca-certificates/mozilla'
-    local cafile="$cadir/${1}.crt"
-    if [ -d "$cadir" ]
-    then
-        curlopts+=(--cacert "$cafile" --capath /nonexistent)
-    fi
+    my ($ca) = @_;
+    my $cadir = '/usr/share/ca-certificates/mozilla';
+    my $cafile = "$cadir/$ca.crt";
+    if (-d $cadir) {
+        $http = HTTP::Tiny->new(
+            %http_options,
+            SSL_options => {SSL_ca_file => $cafile}
+        );
+    }
+    return;
 }
 
-json2yaml()
+sub urlget
 {
-    perl -m-lib=. -0777 -e '
-        use strict;
-        use warnings;
-        use JSON::PP;
-        $_ = <STDIN>;
-        my $jp = JSON::PP->new->utf8->pretty;
-        $_ = $jp->decode($_);
-        my $use_yaml = 0;
-        eval {
-            require YAML::XS;
-            $use_yaml = 1;
-        };
-        if ($use_yaml) {
-            no warnings "once";
-            local $YAML::XS::Boolean = "JSON::PP";
-            $_ = YAML::XS::Dump($_);
-            s/^---\n//;
-        } else {
-            $_ = $jp->encode($_);
+    my ($url, $data) = @_;
+    my $response;
+    if (defined $data) {
+        $response = $http->post_form($url, $data);
+    } else {
+        $response = $http->get($url);
+    }
+    if (not $response->{success}) {
+        die "<$url>: $response->{status} $response->{reason}";
+    }
+    return $response->{content};
+}
+
+sub dump_yaml
+{
+    local ($_) = @_;
+    my $use_yaml = 0;
+    eval {
+        require YAML::XS;
+        $use_yaml = 1;
+    };
+    if ($use_yaml) {
+        no warnings 'once';
+        local $YAML::XS::Boolean = 'JSON::PP';
+        $_ = YAML::XS::Dump($_);
+        s/^---\n//;
+    } else {
+        $_ = $jp->encode($_);
+    }
+    print;
+    return;
+}
+
+sub do_inpost
+{
+    my ($ident) = @_;
+    useca('DigiCert_Global_Root_CA');
+    my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
+    my $data = urlget($url);
+    $data =~ s/\\u0026amp;/&/g;
+    $data = $jp->decode($data);
+    for my $item (@{$data->{tracking_details}}) {
+        if (not defined $item->{agency}) {
+            delete $item->{agency};
         }
-        print $_;
-    '
+    }
+    dump_yaml($data);
+    return;
 }
 
-case $provider in
-    inpost)
-        useca 'DigiCert_Global_Root_CA'
-        url="https://api-shipx-pl.easypack24.net/v1/tracking/$ident"
-        json=$(urlget "$url")
-        json=$(jq 'del(.tracking_details[].agency | nulls)' <<< "$json")
-        json=${json//'&amp;'/&}
-        json2yaml <<< "$json"
-        ;;
-    paczkawruchu)
-        useca 'DigiCert_Global_Root_G2'
-        ts=$(date '+%s000')
-        url="https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts"
-        json=$(urlget "$url")
-        json=${json#callback(}
-        json=${json%);}
-        json=$(jq 'del(.historyHtml, .full)' <<< "$json")
-        json2yaml <<< "$json"
-        ;;
-    poczta|poczta-polska)
-        useca 'Certum_Trusted_Network_CA'
-        tmpdir=$(mktemp -d -t pacz.XXXXXX)
-        url="https://emonitoring.poczta-polska.pl"
-        cookiejar="$tmpdir/cookies"
-        urlget -c "$cookiejar" "$url" > /dev/null
-        sid=$(grep -w PHPSESSID "$cookiejar" | cut -f 7)
-        html=$(urlget -b "$cookiejar" -e "$url/" -d "s=$sid" -d "n=$ident" -d 'l=' "$url/wssClient.php")
-        xc=0
-        case $html in
-            *' Brak danych o tej przesyłce '*)
-                printf 'emonitoring.poczta-polska.pl: no data for %s\n' "$ident" >&2
-                html=''
-                xc=1
-            ;;
-        esac
-        perl -0777 <<< "$html" -e '
-            use strict;
-            use warnings;
-            $_ = <STDIN>;
-            exit if $_ eq "\n";
-            my @tables;
-            s{<table\b[^>]*>(.*?)</table>}{push @tables, $1}sge;
-            $_ = "@tables";
-            s{<a\b[^>]*>(.*?)</a>}{$1}sg;
-            s{<tr\b[^>]*>}{\n}g;
-            s{<t[dh]\b[^>]*>}{ | }g;
-            s{^ [|] }{}mg;
-            s{</t[hdr]>}{}g;
-            s{  *}{ }g;
-            s{ *[|] *$}{ }mg;
-            s{^\s+}{}mg;
-            s{\s+$}{}mg;
-            s{\n\n+}{\n}g;
-            s{\n\z}{};
-            print "$_\n";
-        '
-        rm -rf "$tmpdir"
-        exit $xc
-        ;;
-    gls)
-        useca 'GlobalSign_Root_CA'
-        ts=$(date '+%s000')
-        url="https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts"
-        json=$(urlget "$url")
-        json=$(jq '.tuStatus[0] | del(.progressBar)' <<< "$json")
-        json2yaml <<< "$json"
-        ;;
-    *)
-        bad_usage;;
-esac
+sub do_gls
+{
+    my ($ident) = @_;
+    useca('GlobalSign_Root_CA');
+    my $uts = Time::Piece->new->epoch;
+    my $ts = "${uts}000";
+    my $url = "https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts";
+    my $data = urlget($url);
+    $data = $jp->decode($data);
+    delete $data->{tuStatus}->[0]->{progressBar};
+    dump_yaml($data);
+    return;
+}
+
+sub do_paczkawruchu
+{
+    my ($ident) = @_;
+    useca('DigiCert_Global_Root_G2');
+    my $uts = Time::Piece->new->epoch;
+    my $ts = "${uts}000";
+    my $url = "https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts";
+    my $data = urlget($url);
+    $data =~ s/^callback[(]|[)];$//g;
+    $data = $jp->decode($data);
+    delete $data->{historyHtml};
+    delete $data->{full};
+    dump_yaml($data);
+    return;
+}
+
+sub do_poczta
+{
+    my ($ident) = @_;
+    useca('Certum_Trusted_Network_CA');
+    my $domain = 'emonitoring.poczta-polska.pl';
+    my $url = "https://$domain";
+    urlget($url);
+    my $sid;
+    for my $cookie ($cookie_jar->cookies_for($url)) {
+        if ($cookie->{name} eq 'PHPSESSID') {
+            $sid = $cookie->{value};
+            last;
+        }
+    }
+    if (not defined $sid) {
+        die "$domain: cannot determine session id";
+    }
+    $_ = urlget("$url/wssClient.php", ['s', $sid, 'n', $ident, 'l', '']);
+    if (/ Brak danych o tej przesyłce /) {
+        say {*STDERR} "$domain: no data for $ident";
+        exit 1;
+    }
+    my @tables;
+    s{<table\b[^>]*>(.*?)</table>}{push @tables, $1}sge;
+    $_ = "@tables";
+    s{<a\b[^>]*>(.*?)</a>}{$1}sg;
+    s{<tr\b[^>]*>}{\n}g;
+    s{<t[dh]\b[^>]*>}{ | }g;
+    s{^ [|] }{}mg;
+    s{</t[hdr]>}{}g;
+    s{  *}{ }g;
+    s{ *[|] *$}{ }mg;
+    s{^\s+}{}mg;
+    s{\s+$}{}mg;
+    s{\n\n+}{\n}g;
+    s{\n\z}{};
+    say;
+    return;
+}
+
+sub do_poczta_polska
+{
+    goto &do_poczta;
+}
+
+sub bad_usage
+{
+    say {*STDERR} "Usage: $prog PROVIDER IDENT";
+    say {*STDERR} 'Providers: inpost gls paczkawruchu poczta-polska';
+    exit 1;
+}
+if (@ARGV != 2) {
+    bad_usage;
+}
+my ($provider, $ident) = @ARGV;
+my $action = "do_${provider}";
+$action =~ s/-/_/g;
+if (exists &{$action}) {
+    $action = \&{$action};
+    $action->($ident);
+} else {
+    bad_usage;
+}
 
 # vim:ts=4 sts=4 sw=4 et
