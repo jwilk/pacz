@@ -1,0 +1,32 @@
+severity = 1
+verbose = %f:%l: [%p] %m\n
+
+[-CodeLayout::RequireTidyCode]
+# no, thanks
+
+[-ErrorHandling::RequireCarping]
+# die is good enough
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
+
+[-Modules::RequireVersionVar]
+# see https://bugs.debian.org/706266
+
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+# no, thanks
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+# no, thanks
+
+[-ValuesAndExpressions::ProhibitVersionStrings]
+# we don't care about Perl << 5.6, which doesn't support version strings
+
+[Variables::ProhibitPackageVars]
+add_packages = YAML::XS
+
+# vim:ft=dosini
