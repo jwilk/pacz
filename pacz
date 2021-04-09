@@ -159,6 +159,8 @@ sub do_poczta
     s{ *[|] *$}{ }mg;
     s{^\s+}{}mg;
     s{\s+$}{}mg;
+    s{<br />$}{}mg;
+    s{<br />}{; }mg;
     s{\n\n+}{\n}g;
     s{\n\z}{};
     say;
