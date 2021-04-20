@@ -172,10 +172,26 @@ sub do_poczta_polska
     goto &do_poczta;
 }
 
+sub do_poltraf
+{
+    my ($ident) = @_;
+    useca('Certum_Trusted_Network_CA');
+    $_ = urlget("https://poltraf.pl/zarzadzanie_przesylkami.html?go=ok&nr_przesylki=$ident");
+    m{<tbody\b[>]*>(.*?)</tbody>}s or die;
+    $_ = $1;
+    s{\s*</t[dr]>\s*}{}g;
+    s{\s+}{ }g;
+    s{\s*<td>}{\t}g;
+    s{\s*<tr\b[^>]*>\t}{\n}g;
+    s{\A\n+}{};
+    say;
+    return;
+}
+
 sub bad_usage
 {
     say {*STDERR} "Usage: $prog PROVIDER IDENT";
-    say {*STDERR} 'Providers: inpost gls paczkawruchu poczta-polska';
+    say {*STDERR} 'Providers: inpost gls paczkawruchu poczta-polska poltraf';
     exit 1;
 }
 if (@ARGV != 2) {
