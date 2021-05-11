@@ -52,7 +52,11 @@ sub urlget
         $response = $http->get($url);
     }
     if (not $response->{success}) {
-        die "<$url>: $response->{status} $response->{reason}";
+        if ($response->{status} == 599) {
+            die "<$url>: $response->{content}";
+        } else {
+            die "<$url>: $response->{status} $response->{reason}";
+        }
     }
     return $response->{content};
 }
