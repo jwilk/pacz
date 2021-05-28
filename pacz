@@ -140,7 +140,7 @@ sub do_paczkawruchu
                     delete $item->{$key};
                 }
             }
-            if ($item->{PackCode} == $number) {
+            if ($item->{PackCode} eq $number) {
                 delete $item->{PackCode};
             }
         }
