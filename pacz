@@ -82,6 +82,24 @@ sub dump_yaml
     return;
 }
 
+sub do_dpd
+{
+    my ($ident) = @_;
+    useca('Certum_Trusted_Network_CA');
+    my $url = 'https://tracktrace.dpd.com.pl/findPackage';
+    $_ = urlget($url, ['q', $ident, 'typ', 1]);
+    m{<table class="table-track">(.*?)</table>}s or die;
+    $_ = $1;
+    s{<thead>(?:.*?)</thead>}{}s;
+    s{\s*</?tbody>\s*}{}g;
+    s{\s*</t[dr]>\s*}{}g;
+    s{\s*<td>}{\t}g;
+    s{\s*<tr\b[^>]*>\t}{\n}g;
+    s{\A\n+}{};
+    say;
+    return;
+}
+
 sub do_inpost
 {
     my ($ident) = @_;
@@ -215,7 +233,7 @@ sub do_poltraf
 sub bad_usage
 {
     say {*STDERR} "Usage: $prog PROVIDER IDENT";
-    say {*STDERR} 'Providers: inpost gls paczkawruchu poczta-polska poltraf';
+    say {*STDERR} 'Providers: dpd inpost gls paczkawruchu poczta-polska poltraf';
     exit 1;
 }
 if (@ARGV != 2) {

@@ -2,6 +2,6 @@
 
    $ pacz --help
    Usage: pacz PROVIDER IDENT
-   Providers: inpost gls paczkawruchu poczta-polska poltraf
+   Providers: dpd inpost gls paczkawruchu poczta-polska poltraf
 
 .. vim:ts=3 sts=3 sw=3 et ft=rst
