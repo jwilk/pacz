@@ -241,6 +241,10 @@ sub bad_usage
     print {*STDERR} $usage;
     exit 1;
 }
+if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
+    print $usage;
+    exit 0;
+}
 if (@ARGV != 2) {
     bad_usage;
 }
