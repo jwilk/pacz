@@ -95,6 +95,7 @@ sub do_dpd
     s{\s*</t[dr]>\s*}{}g;
     s{\s*<td>}{\t}g;
     s{\s*<tr\b[^>]*>\t}{\n}g;
+    s{\s*<br>}{; }g;
     s{\A\n+}{};
     say;
     return;
