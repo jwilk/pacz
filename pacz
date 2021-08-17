@@ -232,10 +232,13 @@ sub do_poltraf
     return;
 }
 
+my $usage = <<"EOF";
+Usage: $prog PROVIDER IDENT
+Providers: dpd inpost gls paczkawruchu poczta-polska poltraf
+EOF
 sub bad_usage
 {
-    say {*STDERR} "Usage: $prog PROVIDER IDENT";
-    say {*STDERR} 'Providers: dpd inpost gls paczkawruchu poczta-polska poltraf';
+    print {*STDERR} $usage;
     exit 1;
 }
 if (@ARGV != 2) {
