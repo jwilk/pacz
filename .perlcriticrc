@@ -1,6 +1,9 @@
 severity = 1
 verbose = %f:%l: [%p] %m\n
 
+[-BuiltinFunctions::ProhibitBooleanGrep]
+# no, thanks
+
 [-CodeLayout::RequireTidyCode]
 # no, thanks
 
