@@ -1,0 +1,35 @@
+name: CI
+on:
+- push
+- pull_request
+jobs:
+  main:
+    strategy:
+      matrix:
+        os:
+        - ubuntu-18.04
+        - ubuntu-latest
+    runs-on: ${{matrix.os}}
+    steps:
+    - uses: actions/checkout@v2
+    - name: install rst-lint
+      run: |
+        python -m pip install --user pygments restructuredtext-lint
+    - name: check README syntax
+      run: |
+        rst-lint --level=info --encoding=UTF-8 README
+    - run: |
+        perl --version
+    - name: install perlcritic
+      run: |
+        sudo apt-get install libperl-critic-perl
+    - run: |
+        perlcritic pacz
+    - name: install HTTP::CookieJar
+      run:
+        sudo apt-get install libhttp-cookiejar-perl
+    - name: smoke test
+      run: |
+        ./pacz --help
+
+# vim:ts=2 sts=2 sw=2 et
