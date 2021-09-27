@@ -44,12 +44,20 @@ sub useca
 
 sub urlget
 {
-    my ($url, $data) = @_;
+    my ($url, $data, $args) = @_;
     my $response;
     if (defined $data) {
-        $response = $http->post_form($url, $data);
+        if (ref $data eq '') {
+            $args = {
+                %{$args},
+                content => $data,
+            };
+            $response = $http->post($url, $args // {});
+        } else {
+            $response = $http->post_form($url, $data, $args // {});
+        }
     } else {
-        $response = $http->get($url);
+        $response = $http->get($url, $args // {});
     }
     if (not $response->{success}) {
         if ($response->{status} == 599) {
