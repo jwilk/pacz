@@ -197,6 +197,13 @@ sub do_poczta
     };
     $data = urlget($url, $data, $args);
     $data = $jp->decode($data);
+    for my $item (@{$data->{mailInfo}->{events}}) {
+        for my $key (qw(finished canceled)) {
+            if (exists $item->{$key} and JSON::PP::is_bool($item->{$key}) and not $item->{$key}) {
+                delete $item->{$key};
+            }
+        }
+    }
     dump_yaml($data);
     return;
 }
