@@ -181,41 +181,23 @@ sub do_poczta
 {
     my ($ident) = @_;
     useca('Certum_Trusted_Network_CA');
-    my $domain = 'emonitoring.poczta-polska.pl';
-    my $url = "https://$domain";
-    urlget($url);
-    my $sid;
-    for my $cookie ($cookie_jar->cookies_for($url)) {
-        if ($cookie->{name} eq 'PHPSESSID') {
-            $sid = $cookie->{value};
-            last;
+    my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.0/tracking';
+    my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
+    $_ = urlget($url);
+    m{<div id="widgetTracking" data-urltracking="\Q$api_endpoint\E" data-apikey="([\w+/.=]+)"/>}
+        or die "<$url>: cannot extract API key";
+    my $api_key = $1;
+    $url = "$api_endpoint/checkmailex";
+    my $data = qq({"language":"PL","number":"$ident","addPostOfficeInfo":true});
+    my $args = {
+        headers => {
+            'API_KEY' => $api_key,
+            'Content-Type' => 'application/json; charset=utf-8',
         }
-    }
-    if (not defined $sid) {
-        die "$domain: cannot determine session id";
-    }
-    $_ = urlget("$url/wssClient.php", ['s', $sid, 'n', $ident, 'l', '']);
-    if (/ Brak danych o tej przesyłce /) {
-        say {*STDERR} "$domain: no data for $ident";
-        exit 1;
-    }
-    my @tables;
-    s{<table\b[^>]*>(.*?)</table>}{push @tables, $1}sge;
-    $_ = "@tables";
-    s{<a\b[^>]*>(.*?)</a>}{$1}sg;
-    s{<tr\b[^>]*>}{\n}g;
-    s{<t[dh]\b[^>]*>}{ | }g;
-    s{^ [|] }{}mg;
-    s{</t[hdr]>}{}g;
-    s{  *}{ }g;
-    s{ *[|] *$}{ }mg;
-    s{^\s+}{}mg;
-    s{\s+$}{}mg;
-    s{<br />$}{}mg;
-    s{<br />}{; }mg;
-    s{\n\n+}{\n}g;
-    s{\n\z}{};
-    say;
+    };
+    $data = urlget($url, $data, $args);
+    $data = $jp->decode($data);
+    dump_yaml($data);
     return;
 }
 
