@@ -17,6 +17,9 @@ exclude_functions = print say
 [-Modules::RequireVersionVar]
 # see https://bugs.debian.org/706266
 
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 80
+
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
