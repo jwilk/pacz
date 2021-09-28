@@ -197,11 +197,24 @@ sub do_poczta
     };
     $data = urlget($url, $data, $args);
     $data = $jp->decode($data);
+    my $clean_office = sub {
+        my ($office) = @_;
+        my $descr = $office->{description};
+        delete $descr->{openingHours};
+        if (($descr->{latitude} // 0) == 0 and ($descr->{longitude} // 0) == 0) {
+            delete $descr->{latitude};
+            delete $descr->{longitude};
+        }
+    };
+    $clean_office->($data->{mailInfo}->{dispatchPostOffice});
     for my $item (@{$data->{mailInfo}->{events}}) {
         for my $key (qw(finished canceled)) {
             if (exists $item->{$key} and JSON::PP::is_bool($item->{$key}) and not $item->{$key}) {
                 delete $item->{$key};
             }
+        }
+        if (exists $item->{postOffice}) {
+            $clean_office->($item->{postOffice});
         }
     }
     dump_yaml($data);
