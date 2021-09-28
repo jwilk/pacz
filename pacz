@@ -208,8 +208,15 @@ sub do_poczta
             delete $descr->{longitude};
         }
     };
-    $clean_office->($data->{mailInfo}->{dispatchPostOffice});
-    for my $item (@{$data->{mailInfo}->{events}}) {
+    my $mailinfo = $data->{mailInfo};
+    for my $key (keys %{$data}) {
+        if ($key ne 'mailInfo') {
+            $mailinfo->{$key} = $data->{$key};
+        }
+    }
+    $data = $mailinfo;
+    $clean_office->($data->{dispatchPostOffice});
+    for my $item (@{$data->{events}}) {
         for my $key (qw(finished canceled)) {
             if (exists $item->{$key} and JSON::PP::is_bool($item->{$key}) and not $item->{$key}) {
                 delete $item->{$key};
