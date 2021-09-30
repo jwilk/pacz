@@ -141,13 +141,13 @@ sub do_gls
     return;
 }
 
-sub do_paczkawruchu
+sub do_orlen
 {
     my ($ident) = @_;
-    useca('DigiCert_Global_Root_G2');
+    useca('Certum_Trusted_Network_CA');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
-    my $url = "https://nadaj.paczkawruchu.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts";
+    my $url = "https://nadaj.orlenpaczka.pl/parcel/api-status?id=$ident&jsonp=callback&_=$ts";
     my $data = urlget($url);
     $data =~ s/^callback[(]|[)];$//g;
     $data = $jp->decode($data);
@@ -175,6 +175,11 @@ sub do_paczkawruchu
     }
     dump_yaml($data);
     return;
+}
+
+sub do_paczkawruchu
+{
+    goto &do_orlen;
 }
 
 sub do_poczta
@@ -253,7 +258,7 @@ sub do_poltraf
 
 my $usage = <<"EOF";
 Usage: $prog PROVIDER IDENT
-Providers: dpd inpost gls paczkawruchu poczta-polska poltraf
+Providers: dpd inpost gls orlen poczta-polska poltraf
 EOF
 sub bad_usage
 {
