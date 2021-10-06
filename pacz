@@ -90,6 +90,48 @@ sub dump_yaml
     return;
 }
 
+sub fatal
+{
+    my ($msg) = @_;
+    say {*STDERR} "pacz: $msg";
+    exit 1;
+}
+
+sub do_allegro
+{
+    my ($ident) = @_;
+    my $x = qr/[[:xdigit:]]/;
+    my ($order_uuid) = ($ident =~ m/\b(${x}{8}-${x}{4}-${x}{4}-${x}{4}-${x}{12})\b/i) or do {
+        fatal('allegro: missing order UUID');
+        exit 1;
+    };
+    my ($tracking_id) = ($ident =~ m/\b(ALE${x}{12})\b/i) or do {
+        fatal('allegro: missing tracking ID');
+        exit 1;
+    };
+    my $url = "https://allegro.pl/przesylka/sledzenie/${order_uuid}?waybillId=${tracking_id}&carrierId=ALLEGRO";
+    my $html = urlget($url);
+    while ($html =~ m{<section\b[^>]*>(.*?)</section>}g) {
+        $_ = $1;
+        s{</?div\b[^>]*>}{\n}g;
+        s{</?ol\b[^>]*>}{\n}g;
+        s{<br\b[^>]*>}{\n}g;
+        s{</?span\b[^>]*>}{}g;
+        s{</?(?:p)\b[^>]*>}{ | }g;
+        s{<li\b[^>]*>(.*?)</li>}{• $1\n}g;
+        s{• \K [|] }{}g;
+        s{ [|] *[|] }{ | }g;
+        s{ *[|] *$}{}mg;
+        s{^ *[|] *}{}mg;
+        s{^\n+}{};
+        s{\n+\z}{};
+        s{\n\n+}{\n}g;
+        say;
+        say '';
+    }
+    return;
+}
+
 sub do_dpd
 {
     my ($ident) = @_;
@@ -258,7 +300,7 @@ sub do_poltraf
 
 my $usage = <<"EOF";
 Usage: $prog PROVIDER IDENT
-Providers: dpd inpost gls orlen poczta-polska poltraf
+Providers: allegro dpd inpost gls orlen poczta-polska poltraf
 EOF
 sub bad_usage
 {
