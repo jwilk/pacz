@@ -20,6 +20,9 @@ exclude_functions = print say
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 80
 
+[-RegularExpressions::ProhibitEnumeratedClasses]
+# no, thanks
+
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
