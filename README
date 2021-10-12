@@ -1,7 +1,17 @@
+Overview
+========
+
 .. code:: console
 
    $ pacz --help
    Usage: pacz PROVIDER IDENT
    Providers: allegro dpd inpost gls orlen poczta-polska poltraf
+
+Requisites
+==========
+
+* Perl ≥ 5.14
+
+* `HTTP::CookieJar <https://metacpan.org/release/HTTP-CookieJar>`_
 
 .. vim:ts=3 sts=3 sw=3 et ft=rst
