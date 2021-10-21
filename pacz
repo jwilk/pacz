@@ -166,6 +166,12 @@ sub do_inpost
             delete $item->{agency};
         }
     }
+    if (not defined $data->{custom_attributes}) {
+        delete $data->{custom_attributes};
+    }
+    if (ref $data->{expected_flow} eq 'ARRAY' and scalar @{$data->{expected_flow}} == 0) {
+        delete $data->{expected_flow};
+    }
     dump_yaml($data);
     return;
 }
