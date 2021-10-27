@@ -179,7 +179,7 @@ sub do_inpost
 sub do_gls
 {
     my ($ident) = @_;
-    useca('GlobalSign_Root_CA');
+    useca('GlobalSign_Root_CA_-_R3');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
     my $url = "https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts";
