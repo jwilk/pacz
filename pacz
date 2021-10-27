@@ -185,7 +185,8 @@ sub do_gls
     my $url = "https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts";
     my $data = urlget($url);
     $data = $jp->decode($data);
-    delete $data->{tuStatus}->[0]->{progressBar};
+    $data = $data->{tuStatus}->[0];
+    delete $data->{progressBar};
     dump_yaml($data);
     return;
 }
