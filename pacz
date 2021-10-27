@@ -187,6 +187,9 @@ sub do_gls
     $data = $jp->decode($data);
     $data = $data->{tuStatus}->[0];
     delete $data->{progressBar};
+    for my $history (@{$data->{history}}) {
+        $history->{evtDscr} =~ s/&#([0-9]+);/chr($1)/eg;
+    }
     dump_yaml($data);
     return;
 }
