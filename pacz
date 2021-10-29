@@ -198,6 +198,11 @@ sub do_gls
     for my $history (@{$data->{history}}) {
         decode_entities($history->{evtDscr});
     }
+    my $arrival = $data->{arrivalTime};
+    decode_entities(
+        $arrival->{name},
+        $arrival->{value},
+    );
     dump_yaml($data);
     return;
 }
