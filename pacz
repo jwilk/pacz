@@ -176,6 +176,14 @@ sub do_inpost
     return;
 }
 
+sub decode_entities  ## no critic (RequireArgUnpacking)
+{
+    for my $s (@_) {
+        $s =~ s/&#([0-9]+);/chr($1)/eg;
+    }
+    return;
+}
+
 sub do_gls
 {
     my ($ident) = @_;
@@ -188,7 +196,7 @@ sub do_gls
     $data = $data->{tuStatus}->[0];
     delete $data->{progressBar};
     for my $history (@{$data->{history}}) {
-        $history->{evtDscr} =~ s/&#([0-9]+);/chr($1)/eg;
+        decode_entities($history->{evtDscr});
     }
     dump_yaml($data);
     return;
