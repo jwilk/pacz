@@ -185,6 +185,8 @@ sub decode_entities  ## no critic (RequireArgUnpacking)
 sub do_gls
 {
     my ($ident) = @_;
+    $ident =~ /\A\d+\Z/a or
+        fatal('gls: bad ID format');
     useca('GlobalSign_Root_CA_-_R3');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
