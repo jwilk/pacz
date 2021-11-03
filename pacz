@@ -132,6 +132,8 @@ sub do_allegro
 sub do_dpd
 {
     my ($ident) = @_;
+    $ident =~ /\A[[:alnum:]]+\Z/a or
+        fatal('dpd: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $url = 'https://tracktrace.dpd.com.pl/findPackage';
     $_ = urlget($url, ['q', $ident, 'typ', 1]);
