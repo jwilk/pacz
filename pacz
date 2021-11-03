@@ -251,6 +251,8 @@ sub do_paczkawruchu
 sub do_poczta
 {
     my ($ident) = @_;
+    $ident =~ /\A[[:alnum:]]+\Z/a or
+        fatal('poczta-polska: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.0/tracking';
     my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
