@@ -309,6 +309,8 @@ sub do_poczta_polska
 sub do_poltraf
 {
     my ($ident) = @_;
+    $ident =~ /\A\d+\Z/a or
+        fatal('poltraf: bad ID format');
     useca('Certum_Trusted_Network_CA');
     $_ = urlget("https://poltraf.pl/zarzadzanie_przesylkami.html?go=ok&nr_przesylki=$ident");
     m{<tbody\b[>]*>(.*?)</tbody>}s or die;
