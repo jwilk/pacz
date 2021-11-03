@@ -212,6 +212,8 @@ sub do_gls
 sub do_orlen
 {
     my ($ident) = @_;
+    $ident =~ /\A\d+\Z/a or
+        fatal('orlen: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
