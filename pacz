@@ -101,15 +101,11 @@ sub do_allegro
 {
     my ($ident) = @_;
     my $x = qr/[0-9a-f]/;
-    my ($order_uuid) = ($ident =~ m/\b(${x}{8}-${x}{4}-${x}{4}-${x}{4}-${x}{12})\b/) or do {
+    my ($order_uuid) = ($ident =~ m/\b(${x}{8}-${x}{4}-${x}{4}-${x}{4}-${x}{12})\b/) or
         fatal('allegro: missing order UUID');
-        exit 1;
-    };
     $x = qr/[0-9A-F]/;
-    my ($tracking_id) = ($ident =~ m/\b(ALE${x}{12})\b/) or do {
+    my ($tracking_id) = ($ident =~ m/\b(ALE${x}{12})\b/) or
         fatal('allegro: missing tracking ID');
-        exit 1;
-    };
     my $url = "https://allegro.pl/przesylka/sledzenie/${order_uuid}?waybillId=${tracking_id}&carrierId=ALLEGRO";
     my $html = urlget($url);
     while ($html =~ m{<section\b[^>]*>(.*?)</section>}g) {
