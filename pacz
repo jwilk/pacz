@@ -152,6 +152,8 @@ sub do_dpd
 sub do_inpost
 {
     my ($ident) = @_;
+    $ident =~ /\A\d+\Z/a or
+        fatal('inpost: bad ID format');
     useca('DigiCert_Global_Root_CA');
     my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
     my $data = urlget($url);
