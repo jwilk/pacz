@@ -333,6 +333,9 @@ sub do_pointpack
         my $date = $item->{date};
         $date = Time::Piece::localtime($date / 1000);
         $item->{date} = $date->datetime;
+        if (not defined $item->{notes}) {
+            delete $item->{notes};
+        }
     }
     dump_yaml($data);
     return;
