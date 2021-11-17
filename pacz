@@ -318,6 +318,19 @@ sub do_poczta_polska
     goto &do_poczta;
 }
 
+sub do_pointpack
+{
+    my ($ident) = @_;
+    $ident =~ /\A\d+\Z/a or
+        fatal('pointpack: bad ID format');
+    useca('Certum_Trusted_Network_CA');
+    my $url = "https://www.pointpack.pl/rest/api/v1/tracking/$ident";
+    my $data = urlget($url);
+    $data = $jp->decode($data);
+    dump_yaml($data);
+    return;
+}
+
 sub do_poltraf
 {
     my ($ident) = @_;
@@ -338,7 +351,7 @@ sub do_poltraf
 
 my $usage = <<"EOF";
 Usage: $prog PROVIDER IDENT
-Providers: allegro dpd inpost gls orlen poczta-polska poltraf
+Providers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
 EOF
 sub bad_usage
 {

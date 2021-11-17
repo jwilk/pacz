@@ -5,7 +5,7 @@ Overview
 
    $ pacz --help
    Usage: pacz PROVIDER IDENT
-   Providers: allegro dpd inpost gls orlen poczta-polska poltraf
+   Providers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
 
 Requisites
 ==========
