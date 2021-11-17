@@ -138,7 +138,7 @@ sub do_allegro
 sub do_dpd
 {
     my ($ident) = @_;
-    $ident =~ /\A[[:alnum:]]+\Z/a or
+    $ident =~ /\A[[:alnum:]]+\z/a or
         fatal('dpd: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $url = 'https://tracktrace.dpd.com.pl/findPackage';
@@ -160,7 +160,7 @@ sub do_dpd
 sub do_inpost
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\Z/a or
+    $ident =~ /\A\d+\z/a or
         fatal('inpost: bad ID format');
     useca('DigiCert_Global_Root_CA');
     my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
@@ -193,7 +193,7 @@ sub decode_entities  ## no critic (RequireArgUnpacking)
 sub do_gls
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\Z/a or
+    $ident =~ /\A\d+\z/a or
         fatal('gls: bad ID format');
     useca('GlobalSign_Root_CA_-_R3');
     my $uts = Time::Piece->new->epoch;
@@ -218,7 +218,7 @@ sub do_gls
 sub do_orlen
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\Z/a or
+    $ident =~ /\A\d+\z/a or
         fatal('orlen: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $uts = Time::Piece->new->epoch;
@@ -261,7 +261,7 @@ sub do_paczkawruchu
 sub do_poczta
 {
     my ($ident) = @_;
-    $ident =~ /\A[[:alnum:]]+\Z/a or
+    $ident =~ /\A[[:alnum:]]+\z/a or
         fatal('poczta-polska: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.0/tracking';
@@ -323,7 +323,7 @@ sub do_poczta_polska
 sub do_pointpack
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\Z/a or
+    $ident =~ /\A\d+\z/a or
         fatal('pointpack: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $url = "https://www.pointpack.pl/rest/api/v1/tracking/$ident";
@@ -344,7 +344,7 @@ sub do_pointpack
 sub do_poltraf
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\Z/a or
+    $ident =~ /\A\d+\z/a or
         fatal('poltraf: bad ID format');
     useca('Certum_Trusted_Network_CA');
     $_ = urlget("https://poltraf.pl/zarzadzanie_przesylkami.html?go=ok&nr_przesylki=$ident");
