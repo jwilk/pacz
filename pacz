@@ -281,9 +281,10 @@ sub do_poczta
     $data = urlget($url, $data, $args);
     $data = $jp->decode($data);
     my $clean_office = sub {
-        my ($office) = @_;
+        my ($office, %opts) = @_;
         my $descr = $office->{description};
-        delete $descr->{openingHours};
+        $opts{keep_hours} or
+            delete $descr->{openingHours};
         if (($descr->{latitude} // 0) == 0 and ($descr->{longitude} // 0) == 0) {
             # 0°N 0°E is in the ocean: https://en.wikipedia.org/wiki/Null_Island
             # It can't possibly be the correct location of a post office.
@@ -299,6 +300,7 @@ sub do_poczta
     }
     $data = $mailinfo;
     $clean_office->($data->{dispatchPostOffice});
+    $clean_office->($data->{recipientPostOffice}, keep_hours => 1);
     for my $item (@{$data->{events}}) {
         for my $key (qw(finished canceled)) {
             if (exists $item->{$key} and JSON::PP::is_bool($item->{$key}) and not $item->{$key}) {
