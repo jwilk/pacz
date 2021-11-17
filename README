@@ -4,8 +4,8 @@ Overview
 .. code:: console
 
    $ pacz --help
-   Usage: pacz PROVIDER IDENT
-   Providers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
+   Usage: pacz CARRIER IDENT
+   Carriers:  allegro dpd inpost gls orlen poczta-polska pointpack poltraf
 
 Requisites
 ==========

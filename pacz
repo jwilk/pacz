@@ -352,8 +352,8 @@ sub do_poltraf
 }
 
 my $usage = <<"EOF";
-Usage: $prog PROVIDER IDENT
-Providers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
+Usage: $prog CARRIER IDENT
+Carriers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
 EOF
 sub bad_usage
 {
@@ -367,8 +367,8 @@ if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
 if (@ARGV != 2) {
     bad_usage;
 }
-my ($provider, $ident) = @ARGV;
-my $action = "do_${provider}";
+my ($carrier, $ident) = @ARGV;
+my $action = "do_${carrier}";
 $action =~ s/-/_/g;
 if (exists &{$action}) {
     $action = \&{$action};
