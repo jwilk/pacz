@@ -157,31 +157,6 @@ sub carrier::dpd
     return;
 }
 
-sub carrier::inpost
-{
-    my ($ident) = @_;
-    $ident =~ /\A\d+\z/a or
-        fatal('inpost: bad ID format');
-    useca('DigiCert_Global_Root_CA');
-    my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
-    my $data = urlget($url);
-    $data =~ s/\\u0026amp;/&/g;
-    $data = $jp->decode($data);
-    for my $item (@{$data->{tracking_details}}) {
-        if (not defined $item->{agency}) {
-            delete $item->{agency};
-        }
-    }
-    if (not defined $data->{custom_attributes}) {
-        delete $data->{custom_attributes};
-    }
-    if (ref $data->{expected_flow} eq 'ARRAY' and scalar @{$data->{expected_flow}} == 0) {
-        delete $data->{expected_flow};
-    }
-    dump_yaml($data);
-    return;
-}
-
 sub decode_entities  ## no critic (RequireArgUnpacking)
 {
     for my $s (@_) {
@@ -211,6 +186,31 @@ sub carrier::gls
         $arrival->{name},
         $arrival->{value},
     );
+    dump_yaml($data);
+    return;
+}
+
+sub carrier::inpost
+{
+    my ($ident) = @_;
+    $ident =~ /\A\d+\z/a or
+        fatal('inpost: bad ID format');
+    useca('DigiCert_Global_Root_CA');
+    my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
+    my $data = urlget($url);
+    $data =~ s/\\u0026amp;/&/g;
+    $data = $jp->decode($data);
+    for my $item (@{$data->{tracking_details}}) {
+        if (not defined $item->{agency}) {
+            delete $item->{agency};
+        }
+    }
+    if (not defined $data->{custom_attributes}) {
+        delete $data->{custom_attributes};
+    }
+    if (ref $data->{expected_flow} eq 'ARRAY' and scalar @{$data->{expected_flow}} == 0) {
+        delete $data->{expected_flow};
+    }
     dump_yaml($data);
     return;
 }
