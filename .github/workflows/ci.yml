@@ -25,6 +25,9 @@ jobs:
         sudo apt-get install libperl-critic-perl
     - run: |
         perlcritic pacz
+    - name: check whether carriers are sorted in the code
+      run: |
+        grep '^sub carrier::[^_]' pacz | LC_ALL=C sort -c
     - name: install HTTP::CookieJar
       run:
         sudo apt-get install libhttp-cookiejar-perl
