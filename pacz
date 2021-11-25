@@ -262,7 +262,7 @@ sub do_poczta
 {
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]+\z/a or
-        fatal('poczta-polska: bad ID format');
+        fatal('poczta: bad ID format');
     useca('Certum_Trusted_Network_CA');
     my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.0/tracking';
     my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
@@ -361,7 +361,7 @@ sub do_poltraf
 
 my $usage = <<"EOF";
 Usage: $prog CARRIER IDENT
-Carriers: allegro dpd inpost gls orlen poczta-polska pointpack poltraf
+Carriers: allegro dpd inpost gls orlen poczta pointpack poltraf
 EOF
 sub bad_usage
 {
