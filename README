@@ -5,7 +5,7 @@ Overview
 
    $ pacz --help
    Usage: pacz CARRIER IDENT
-   Carriers:  allegro dpd inpost gls orlen poczta pointpack poltraf
+   Carriers:  allegro dpd gls inpost orlen poczta pointpack poltraf
 
 Requisites
 ==========
