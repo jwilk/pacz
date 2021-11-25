@@ -97,7 +97,7 @@ sub fatal
     exit 1;
 }
 
-sub do_allegro
+sub carrier::allegro
 {
     my ($ident) = @_;
     my $x = qr/[0-9a-f]/;
@@ -135,7 +135,7 @@ sub do_allegro
     return;
 }
 
-sub do_dpd
+sub carrier::dpd
 {
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]+\z/a or
@@ -157,7 +157,7 @@ sub do_dpd
     return;
 }
 
-sub do_inpost
+sub carrier::inpost
 {
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
@@ -190,7 +190,7 @@ sub decode_entities  ## no critic (RequireArgUnpacking)
     return;
 }
 
-sub do_gls
+sub carrier::gls
 {
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
@@ -215,7 +215,7 @@ sub do_gls
     return;
 }
 
-sub do_orlen
+sub carrier::orlen
 {
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
@@ -253,12 +253,12 @@ sub do_orlen
     return;
 }
 
-sub do_paczkawruchu
+sub carrier::_paczkawruchu
 {
-    goto &do_orlen;
+    goto &carrier::orlen;
 }
 
-sub do_poczta
+sub carrier::poczta
 {
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]+\z/a or
@@ -315,12 +315,12 @@ sub do_poczta
     return;
 }
 
-sub do_poczta_polska
+sub carrier::_poczta_polska
 {
-    goto &do_poczta;
+    goto &carrier::poczta;
 }
 
-sub do_pointpack
+sub carrier::pointpack
 {
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
@@ -341,7 +341,7 @@ sub do_pointpack
     return;
 }
 
-sub do_poltraf
+sub carrier::poltraf
 {
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
@@ -359,9 +359,18 @@ sub do_poltraf
     return;
 }
 
+my %carriers;
+my @carrier_names;
+for my $cname (sort keys %carrier::) {
+    my $func = $carrier::{$cname};
+    if (not $cname =~ s/\A_//) {
+        push @carrier_names, $cname;
+    }
+    $carriers{$cname} = $func;
+}
 my $usage = <<"EOF";
 Usage: $prog CARRIER IDENT
-Carriers: allegro dpd gls inpost orlen poczta pointpack poltraf
+Carriers: @carrier_names
 EOF
 sub bad_usage
 {
@@ -375,11 +384,9 @@ if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
 if (@ARGV != 2) {
     bad_usage;
 }
-my ($carrier, $ident) = @ARGV;
-my $action = "do_${carrier}";
-$action =~ s/-/_/g;
-if (exists &{$action}) {
-    $action = \&{$action};
+my ($cname, $ident) = @ARGV;
+$cname =~ s/-/_/g;
+if (my $action = $carriers{$cname}) {
     $action->($ident);
 } else {
     bad_usage;
