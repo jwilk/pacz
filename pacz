@@ -42,7 +42,7 @@ sub useca
     return;
 }
 
-sub urlget
+sub xurlget
 {
     my ($url, $data, $args) = @_;
     my $response;
@@ -66,6 +66,13 @@ sub urlget
             die "<$url>: $response->{status} $response->{reason}";
         }
     }
+    return $response;
+}
+
+sub urlget
+{
+    my @args = @_;
+    my $response = xurlget(@args);
     return $response->{content};
 }
 
