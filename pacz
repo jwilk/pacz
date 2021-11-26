@@ -372,7 +372,7 @@ my @carrier_names;
 for my $cname (sort keys %carrier::) {
     my $func = $carrier::{$cname};
     if (not $cname =~ s/\A_//) {
-        push @carrier_names, $cname;
+        push @carrier_names, ($cname =~ s/_/-/rg);
     }
     $carriers{$cname} = $func;
 }
