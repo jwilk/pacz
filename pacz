@@ -49,10 +49,10 @@ sub urlget
     if (defined $data) {
         if (ref $data eq '') {
             $args = {
-                %{$args},
+                %{$args // {}},
                 content => $data,
             };
-            $response = $http->post($url, $args // {});
+            $response = $http->post($url, $args);
         } else {
             $response = $http->post_form($url, $data, $args // {});
         }
