@@ -220,6 +220,32 @@ sub carrier::gls
     return;
 }
 
+sub remove_null_cruft
+{
+    my ($data) = @_;
+    for my $key (keys %{$data}) {
+        my $value = $data->{$key};
+        if (not defined $value) {
+            delete $data->{$key};
+        } elsif (ref $value eq 'HASH') {
+            remove_null_cruft($value);
+            if (%{$value} == 0) {
+                delete $data->{$key};
+            }
+        } elsif (ref $value eq 'ARRAY') {
+            if (@{$value} == 0) {
+                delete $data->{$key};
+            }
+            for my $item (@{$value}) {
+                if (ref $item eq 'HASH') {
+                    remove_null_cruft($item);
+                }
+            }
+        }
+    }
+    return;
+}
+
 sub carrier::inpost
 {
     my ($ident) = @_;
