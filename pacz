@@ -416,6 +416,53 @@ sub carrier::poltraf
     return;
 }
 
+sub carrier::swiss_post
+{
+    my ($ident) = @_;
+    $ident =~ /\A[[:alnum:].]+\z/a or
+        fatal('swiss-post: bad ID format');
+    useca('SwissSign_Gold_CA_-_G2');
+    my $response = xurlget('https://service.post.ch/ekp-web/api/user');
+    my $data = $response->{content};
+    $data = $jp->decode($data);
+    my $user_id = $data->{userIdentifier};
+    my $wfu_user_id = $http->www_form_urlencode({userId => $user_id});
+    my $csrf_token = $response->{headers}->{'x-csrf-token'};
+    my $url = "https://service.post.ch/ekp-web/api/history?$wfu_user_id";
+    my $post_data = qq({"searchQuery":"$ident"});
+    my $args = {
+        headers => {
+            'Content-Type' => 'application/json',
+            'x-csrf-token' => $csrf_token,
+        }
+    };
+    $data = urlget($url, $post_data, $args);
+    $data = $jp->decode($data);
+    my $hash = $data->{hash};
+    $hash =~ /\A[\da-f]+\z/a or
+        die "swiss-post: bad hash $Q{$hash}";
+    $url = "https://service.post.ch/ekp-web/api/history/not-included/$hash?$wfu_user_id";
+    $data = urlget($url);
+    $data = $jp->decode($data);
+    if (scalar @{$data} != 1) {
+        my $n = scalar @{$data};
+        die "swiss-post: bad number of items ($n != 1)";
+    }
+    ($data) = @{$data};
+    my $identity = delete $data->{identity};
+    $identity =~ /\A[[:alnum:]-]+\z/a
+        or die "swiss-post: bad identity $Q{$identity}";
+    if (exists $data->{events}) {
+        die 'swiss-post: events key already exists';
+    }
+    $url = "https://service.post.ch/ekp-web/api/shipment/id/$identity/events/";
+    my $events_data = urlget($url);
+    $data->{events} = $jp->decode($events_data);
+    remove_null_cruft($data);
+    dump_yaml($data);
+    return;
+}
+
 my %carriers;
 my @carrier_names;
 for my $cname (sort keys %carrier::) {
