@@ -104,6 +104,27 @@ sub fatal
     exit 1;
 }
 
+sub quote
+{
+    my ($x) = @_;
+    state $json_encoder = JSON::PP->new->ascii->allow_nonref;
+    return $json_encoder->encode($x);
+}
+
+sub quote::TIEHASH
+{
+    my ($self) = @_;
+    return bless {}, $self;
+}
+
+sub quote::FETCH
+{
+    my ($self, $index) = @_;
+    return quote($index);
+}
+
+tie my %Q, 'quote';  ## no critic (ProhibitTies)
+
 sub carrier::allegro
 {
     my ($ident) = @_;
