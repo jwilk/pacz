@@ -151,7 +151,8 @@ sub carrier::dpd
     useca('Certum_Trusted_Network_CA');
     my $url = 'https://tracktrace.dpd.com.pl/findPackage';
     $_ = urlget($url, ['q', $ident, 'typ', 1]);
-    m{<table class="table-track">(.*?)</table>}s or die;
+    m{<table class="table-track">(.*?)</table>}s
+        or die 'dpd: cannot extract tracking table';
     $_ = $1;
     s{<thead>(?:.*?)</thead>}{}s;
     s{\s*</?tbody>\s*}{}g;
