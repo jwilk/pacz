@@ -14,4 +14,6 @@ Requisites
 
 * `HTTP::CookieJar <https://metacpan.org/release/HTTP-CookieJar>`_
 
+* `YAML::XS <https://metacpan.org/dist/YAML-LibYAML>`_ (recommended)
+
 .. vim:ts=3 sts=3 sw=3 et ft=rst
