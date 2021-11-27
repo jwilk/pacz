@@ -357,7 +357,8 @@ sub carrier::poltraf
         fatal('poltraf: bad ID format');
     useca('Certum_Trusted_Network_CA');
     $_ = urlget("https://poltraf.pl/zarzadzanie_przesylkami.html?go=ok&nr_przesylki=$ident");
-    m{<tbody\b[>]*>(.*?)</tbody>}s or die;
+    m{<tbody\b[>]*>(.*?)</tbody>}s
+        or die 'poltraf: cannot extract tracking table';
     $_ = $1;
     s{\s*</t[dr]>\s*}{}g;
     s{\s+}{ }g;
