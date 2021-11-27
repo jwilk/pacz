@@ -86,8 +86,8 @@ sub dump_yaml
         $use_yaml = 0;
     };
     if ($use_yaml) {
-        no warnings 'once';  ## no critic (ProhibitNoWarnings)
         local $YAML::XS::Boolean = 'JSON::PP';
+        scalar $YAML::XS::Boolean;  # inhibit "used only once" warning
         $_ = YAML::XS::Dump($_);
         s/^---\n//;
     } else {
