@@ -12,7 +12,7 @@ Requisites
 
 * Perl ≥ 5.14
 
-* `HTTP::CookieJar <https://metacpan.org/release/HTTP-CookieJar>`_
+* `HTTP::CookieJar <https://metacpan.org/dist/HTTP-CookieJar>`_
 
 * `YAML::XS <https://metacpan.org/dist/YAML-LibYAML>`_ (recommended)
 
