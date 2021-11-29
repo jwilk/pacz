@@ -31,6 +31,6 @@ jobs:
         sudo apt-get install libhttp-cookiejar-perl
     - name: run tests
       run: |
-        prove -v
+        PACZ_NETWORK_TESTING=1 prove -v
 
 # vim:ts=2 sts=2 sw=2 et
