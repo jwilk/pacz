@@ -472,6 +472,7 @@ for my $cname (sort keys %carrier::) {
     }
     $carriers{$cname} = $func;
 }
+
 my $usage = <<"EOF";
 Usage: $prog CARRIER IDENT
 Carriers: @carrier_names
@@ -481,19 +482,30 @@ sub bad_usage
     print {*STDERR} $usage;
     exit 1;
 }
-if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
-    print $usage;
-    exit 0;
+
+sub main
+{
+    if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
+        print $usage;
+        exit 0;
+    }
+    if (@ARGV != 2) {
+        bad_usage;
+    }
+    my ($cname, $ident) = @ARGV;
+    $cname =~ s/-/_/g;
+    if (my $action = $carriers{$cname}) {
+        $action->($ident);
+    } else {
+        bad_usage;
+    }
+    return;
 }
-if (@ARGV != 2) {
-    bad_usage;
+
+if (not caller) {
+    main;
 }
-my ($cname, $ident) = @ARGV;
-$cname =~ s/-/_/g;
-if (my $action = $carriers{$cname}) {
-    $action->($ident);
-} else {
-    bad_usage;
-}
+
+1;
 
 # vim:ts=4 sts=4 sw=4 et
