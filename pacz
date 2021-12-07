@@ -521,7 +521,7 @@ sub main
             bad_usage(reason => $msg);
         };
         Getopt::Long::GetOptions(
-            'help|h' => \$opt_help,
+            'h|help' => \$opt_help,
             'j|json' => sub { $use_yaml = 0; },
         ) or bad_usage;
     }
