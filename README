@@ -5,7 +5,11 @@ Overview
 
    $ pacz --help
    Usage: pacz CARRIER IDENT
+
    Carriers: allegro dpd gls inpost orlen poczta pointpack poltraf swiss-post
+
+   Options:
+     -h, --help  show this help message and exit
 
 Requisites
 ==========

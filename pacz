@@ -10,6 +10,7 @@ use warnings;
 use v5.14;
 
 use English qw(-no_match_vars);
+use Getopt::Long ();
 use HTTP::Tiny;
 use JSON::PP;
 use Time::Piece;
@@ -482,29 +483,59 @@ for my $cname (sort keys %carrier::) {
 
 my $usage = <<"EOF";
 Usage: $prog CARRIER IDENT
+
 Carriers: @carrier_names
+
+Options:
+  -h, --help  show this help message and exit
 EOF
 sub bad_usage
 {
-    print {*STDERR} $usage;
+    my %opts = @_;
+    my $reason = $opts{reason};
+    if (defined $reason) {
+        warning($reason);
+    }
+    my ($short_usage) = $usage =~ /^(Usage:.*\n)/m;
+    if ($opts{show_carriers}) {
+        my ($line) = $usage =~ /^(Carriers:.*\n)/m;
+        $short_usage .= $line;
+    }
+    print {*STDERR} $short_usage;
     exit 1;
 }
 
 sub main
 {
-    if (@ARGV == 1 and grep { $ARGV[0] eq $_ } qw(-h --help)) {
+    my $opt_help;
+    {
+        local $SIG{__WARN__} = sub {
+            my ($msg) = @_;
+            $msg = lcfirst $msg;
+            $msg =~ s/\n+\z//;
+            bad_usage(reason => $msg);
+        };
+        Getopt::Long::GetOptions(
+            'help|h' => \$opt_help,
+        ) or bad_usage;
+    }
+    if ($opt_help) {
         print $usage;
         exit 0;
     }
-    if (@ARGV != 2) {
-        bad_usage;
+    if (@ARGV < 2) {
+        bad_usage(reason => 'too few arguments')
+    }
+    if (@ARGV > 2) {
+        bad_usage(reason => 'too many arguments')
     }
     my ($cname, $ident) = @ARGV;
+    my $orig_cname = $cname;
     $cname =~ s/-/_/g;
     if (my $action = $carriers{$cname}) {
         $action->($ident);
     } else {
-        bad_usage;
+        bad_usage(reason => "no such carrier $Q{$orig_cname}", show_carriers => 1);
     }
     return;
 }
