@@ -450,7 +450,7 @@ sub carrier::swiss_post
     }
     ($data) = @{$data};
     my $identity = delete $data->{identity};
-    $identity =~ /\A[[:alnum:]-]+\z/a
+    $identity =~ /\A[\w-]+\z/a
         or die "swiss-post: bad identity $Q{$identity}";
     if (exists $data->{events}) {
         die 'swiss-post: events key already exists';
