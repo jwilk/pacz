@@ -97,10 +97,17 @@ sub dump_yaml
     return;
 }
 
-sub fatal
+sub warning
 {
     my ($msg) = @_;
     say {*STDERR} "pacz: $msg";
+    return;
+}
+
+sub fatal
+{
+    my ($msg) = @_;
+    warning($msg);
     exit 1;
 }
 
