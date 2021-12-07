@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+# Copyright © 2021 Jakub Wilk <jwilk@jwilk.net>
+# SPDX-License-Identifier: MIT
+
+no lib '.';  # CVE-2016-1238
+
+use strict;
+use warnings;
+use v5.14;
+
+use English qw(-no_match_vars);
+use FindBin ();
+use autodie;
+
+my $base = "$FindBin::Bin/..";
+
+my $readme;
+open my $fh, '<', "$base/README";
+{
+    local $RS = undef;
+    $readme = <$fh>;
+}
+close $fh;
+my $usage;
+open $fh, '-|', "$base/pacz", '--help';
+{
+    local $RS = undef;
+    $usage = <$fh>;
+}
+close $fh;
+$usage =~ s/^(?=.)/   /mg;
+$readme =~ s/\n   \$ pacz --help\n\K.*?(?=\n\S)/$usage/s;
+open $fh, '>', "$base/README";
+{
+    print {$fh} $readme;
+}
+close $fh;
+
+# vim:ts=4 sts=4 sw=4 et
