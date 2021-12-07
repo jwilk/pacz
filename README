@@ -4,11 +4,13 @@ Overview
 .. code:: console
 
    $ pacz --help
-   Usage: pacz CARRIER IDENT
+   Usage: pacz [-j] CARRIER IDENT
 
    Carriers: allegro dpd gls inpost orlen poczta pointpack poltraf swiss-post
 
    Options:
+     -j, --json  prefer JSON (not YAML) for printing
+                 machine-readable data
      -h, --help  show this help message and exit
 
 Requisites

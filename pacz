@@ -77,15 +77,18 @@ sub urlget
     return $response->{content};
 }
 
+my $use_yaml = 1;
+
 sub dump_yaml
 {
     local ($_) = @_;
-    my $use_yaml = 1;
-    eval {
-        require YAML::XS;
-    } or do {
-        $use_yaml = 0;
-    };
+    if ($use_yaml) {
+        eval {
+            require YAML::XS;
+        } or do {
+            $use_yaml = 0;
+        };
+    }
     if ($use_yaml) {
         local $YAML::XS::Boolean = 'JSON::PP';
         scalar $YAML::XS::Boolean;  # inhibit "used only once" warning
@@ -482,11 +485,13 @@ for my $cname (sort keys %carrier::) {
 }
 
 my $usage = <<"EOF";
-Usage: $prog CARRIER IDENT
+Usage: $prog [-j] CARRIER IDENT
 
 Carriers: @carrier_names
 
 Options:
+  -j, --json  prefer JSON (not YAML) for printing
+              machine-readable data
   -h, --help  show this help message and exit
 EOF
 sub bad_usage
@@ -517,6 +522,7 @@ sub main
         };
         Getopt::Long::GetOptions(
             'help|h' => \$opt_help,
+            'j|json' => sub { $use_yaml = 0; },
         ) or bad_usage;
     }
     if ($opt_help) {
