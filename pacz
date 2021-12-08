@@ -493,23 +493,28 @@ my @carrier_names;
 for my $uname (sort keys %carrier::) {
     my $func = $carrier::{$uname};
     my $cname = $uname =~ s/_/-/rg;
-    push @carrier_names, $cname;
+    my $xname = $cname;
+    my @caliases = @{$aliases{$cname} // []};
+    if (@caliases) {
+        $xname .= " (@caliases)";
+    }
+    push @carrier_names, $xname;
     $carriers{$cname} = $func;
-    for my $alias (@{$aliases{$cname}}) {
+    for my $alias (@caliases) {
         $carriers{$alias} = $func;
     }
 }
 
-my $usage = <<"EOF";
-Usage: $prog [-j] CARRIER IDENT
-
-Carriers: @carrier_names
-
+my $usage_short = "Usage: $prog [-j] CARRIER IDENT\n";
+my $usage_carriers = "Carriers: @carrier_names\n";
+my $usage_options = <<'EOF';
 Options:
   -j, --json  prefer JSON (not YAML) for printing
               machine-readable data
   -h, --help  show this help message and exit
 EOF
+my $usage_long = "$usage_short\n$usage_carriers\n$usage_options";
+
 sub bad_usage
 {
     my %opts = @_;
@@ -517,12 +522,11 @@ sub bad_usage
     if (defined $reason) {
         warning($reason);
     }
-    my ($short_usage) = $usage =~ /^(Usage:.*\n)/m;
+    my ($usage) = $usage_short;
     if ($opts{show_carriers}) {
-        my ($line) = $usage =~ /^(Carriers:.*\n)/m;
-        $short_usage .= $line;
+        $usage .= $usage_carriers;
     }
-    print {*STDERR} $short_usage;
+    print {*STDERR} $usage;
     exit 1;
 }
 
@@ -542,7 +546,7 @@ sub main
         ) or bad_usage;
     }
     if ($opt_help) {
-        print $usage;
+        print $usage_long;
         exit 0;
     }
     if (@ARGV < 2) {
