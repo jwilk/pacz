@@ -297,6 +297,7 @@ sub carrier::orlen
     delete $data->{historyHtml};
     delete $data->{full};
     my $number = $data->{number};
+    $data->{xml} //= {};
     if (%{$data->{xml}} == 0) {
         delete $data->{xml};
     } else {
