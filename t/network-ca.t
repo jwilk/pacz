@@ -12,6 +12,8 @@ use v5.14;
 use B::Deparse ();
 use English qw(-no_match_vars);
 use FindBin ();
+use threads ();
+
 use Test::More;
 
 use IO::Socket::SSL;
@@ -39,6 +41,23 @@ if ($ENV{$var}) {
     plan skip_all => "set $var=1 to enable tests that exercise network";
 }
 my $cadir = '/usr/share/ca-certificates/mozilla';
+sub check_host
+{
+    my ($host, $cafile) = @_;
+    my $socket = IO::Socket::SSL->new(
+        PeerHost => $host,
+        PeerPort => 'https',
+        SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER,
+        SSL_ca_file => $cafile,
+    );
+    if ($socket) {
+        $socket->close();
+        return 1;
+    } else {
+        return (undef, $IO::Socket::SSL::SSL_ERROR);
+    }
+}
+my %host2thread;
 for my $host (sort keys %host2ca) {
     my $ca = $host2ca{$host};
     if (not defined $ca) {
@@ -47,17 +66,19 @@ for my $host (sort keys %host2ca) {
     }
     my $cafile = "$cadir/$ca.crt";
     stat $cafile or die "$cafile: $ERRNO";
-    my $socket = IO::Socket::SSL->new(
-        PeerHost => $host,
-        PeerPort => 'https',
-        SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER,
-        SSL_ca_file => $cafile,
+    $host2thread{$host} = threads->create(
+        {list => 1},
+        \&check_host, $host, $cafile
     );
-    ok($socket, "$host uses $ca");
-    if ($socket) {
-        $socket->close();
-    } else {
-        diag "$host: $IO::Socket::SSL::SSL_ERROR";
+}
+for my $host (sort keys %host2ca) {
+    my $ca = $host2ca{$host};
+    my $thread = $host2thread{$host};
+    my ($ok, $error) = $thread->join();
+    ok($ok, "$host uses $ca");
+    if (not $ok) {
+        $error //= 'unknown error';
+        diag "$host: $error";
     }
 }
 
