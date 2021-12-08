@@ -506,7 +506,11 @@ for my $uname (sort keys %carrier::) {
 }
 
 my $usage_short = "Usage: $prog [-j] CARRIER IDENT\n";
-my $usage_carriers = "Carriers: @carrier_names\n";
+my $usage_short_carriers = "Carriers: @carrier_names\n";
+my $usage_carriers = (
+    "Carriers:\n" .
+    join '', map { "  $_\n" } @carrier_names
+);
 my $usage_options = <<'EOF';
 Options:
   -j, --json  prefer JSON (not YAML) for printing
@@ -524,7 +528,7 @@ sub bad_usage
     }
     my ($usage) = $usage_short;
     if ($opts{show_carriers}) {
-        $usage .= $usage_carriers;
+        $usage .= $usage_short_carriers;
     }
     print {*STDERR} $usage;
     exit 1;

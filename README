@@ -6,7 +6,16 @@ Overview
    $ pacz --help
    Usage: pacz [-j] CARRIER IDENT
 
-   Carriers: allegro dpd gls inpost orlen (paczkawruchu) poczta (poczta-polska) pointpack poltraf swiss-post
+   Carrires:
+     allegro
+     dpd
+     gls
+     inpost
+     orlen (paczkawruchu)
+     poczta (poczta-polska)
+     pointpack
+     poltraf
+     swiss-post
 
    Options:
      -j, --json  prefer JSON (not YAML) for printing
