@@ -502,6 +502,70 @@ sub carrier::swiss_post
 
 alias('swiss-post', qw(post.ch));
 
+sub carrier::ups
+{
+    my ($ident) = @_;
+    $ident =~ /\A[[:alnum:]]+\z/a or
+        fatal('ups: bad ID format');
+    useca('COMODO_RSA_Certification_Authority');
+    my $url = "https://www.ups.com/track?tracknum=$ident&requester=ST/trackdetails";
+    urlget($url);
+    my $xsrf_token;
+    for my $cookie ($cookie_jar->cookies_for($url)) {
+        if ($cookie->{name} eq 'X-XSRF-TOKEN-ST') {
+            $xsrf_token = $cookie->{value};
+            $xsrf_token =~ /\A[\w-]+\z/
+                or die "ups: bad XSRF token $Q{$xsrf_token}";
+        }
+    }
+    defined $xsrf_token
+        or die 'ups: cannot extract XSRF token';
+    my $locale = 'en_GB'; # 24-hour time, DD/MM/YYYY date format
+    my $post_data = qq({"Locale":"$locale","TrackingNumber":["$ident"],"Requester":"","returnToValue":""});
+    my $request_opts = {
+        headers => {
+            'Content-Type' => 'application/json',
+            'Referer' => $url,
+            'X-XSRF-TOKEN' => $xsrf_token,
+        }
+    };
+    $url = "https://www.ups.com/track/api/Track/GetStatus?loc=$locale";
+    my $data = urlget($url, $post_data, $request_opts);
+    $data = $jp->decode($data);
+    my $details = $data->{trackDetails};
+    if (scalar @{$details} != 1) {
+        my $n = scalar @{$details};
+        die "ups: bad number of items ($n != 1)";
+    }
+    ($data) = @{$details};
+    remove_null_cruft($data);
+    my $format_datetime = sub {
+        my ($date, $time) = @_;
+        my $xdate = Time::Piece->strptime($date, '%d/%m/%Y')
+            or die "upc: bad date $Q{$date}";
+        my $xtime = Time::Piece->strptime($time, '%H:%M')
+            or die "upc: bad time $Q{$time}";
+        return $xdate->ymd . 'T' . $xtime->hms;
+    };
+    delete $data->{sendUpdatesOptions};
+    if ($data->{deliveredDate} and $data->{deliveredTime}) {
+        my $date = delete $data->{deliveredDate};
+        my $time = delete $data->{deliveredTime};
+        delete $data->{deliveredDateDetail};
+        delete $data->{deliveredDayCMSKey};
+        $data->{deliveredDate} = $format_datetime->($date, $time);
+    }
+    for my $event (@{$data->{shipmentProgressActivities}}) {
+        my $date = delete $event->{date};
+        my $time = delete $event->{time};
+        $event->{date} = $format_datetime->($date, $time);
+    }
+    dump_yaml($data);
+    return;
+}
+
+alias('ups', qw(ups.com));
+
 my %carriers;
 my @carrier_names;
 for my $uname (sort keys %carrier::) {

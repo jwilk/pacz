@@ -16,6 +16,7 @@ Overview
      pointpack (pointpack.pl)
      poltraf (poltraf.pl)
      swiss-post (post.ch)
+     ups (ups.com)
 
    Options:
      -j, --json  prefer JSON (not YAML) for printing
