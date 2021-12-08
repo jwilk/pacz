@@ -136,6 +136,25 @@ sub quote::FETCH
 
 tie my %Q, 'quote';  ## no critic (ProhibitTies)
 
+my $cname_regexp = qr/\A[[:alnum:].-]+\z/a;
+
+my %aliases;
+sub alias
+{
+    my ($cname, @aliases) = @_;
+    $cname =~ $cname_regexp
+        or die "bad carrier name $Q{$cname}";
+    my $uname = $cname =~ s/-/_/rg;
+    $carrier::{$uname}
+        or die "no such carrier $Q{$cname}";
+    for my $alias (@aliases) {
+        $alias =~ $cname_regexp
+            or die "bad alias name $Q{$alias}";
+        push @{$aliases{$cname}}, $alias;
+    }
+    return;
+}
+
 sub carrier::allegro
 {
     my ($ident) = @_;
@@ -321,10 +340,7 @@ sub carrier::orlen
     return;
 }
 
-sub carrier::_paczkawruchu
-{
-    goto &carrier::orlen;
-}
+alias('orlen', qw(paczkawruchu));
 
 sub carrier::poczta
 {
@@ -383,10 +399,7 @@ sub carrier::poczta
     return;
 }
 
-sub carrier::_poczta_polska
-{
-    goto &carrier::poczta;
-}
+alias('poczta', qw(poczta-polska));
 
 sub carrier::pointpack
 {
@@ -477,12 +490,14 @@ sub carrier::swiss_post
 
 my %carriers;
 my @carrier_names;
-for my $cname (sort keys %carrier::) {
-    my $func = $carrier::{$cname};
-    if (not $cname =~ s/\A_//) {
-        push @carrier_names, ($cname =~ s/_/-/rg);
-    }
+for my $uname (sort keys %carrier::) {
+    my $func = $carrier::{$uname};
+    my $cname = $uname =~ s/_/-/rg;
+    push @carrier_names, $cname;
     $carriers{$cname} = $func;
+    for my $alias (@{$aliases{$cname}}) {
+        $carriers{$alias} = $func;
+    }
 }
 
 my $usage = <<"EOF";
@@ -537,12 +552,10 @@ sub main
         bad_usage(reason => 'too many arguments')
     }
     my ($cname, $ident) = @ARGV;
-    my $orig_cname = $cname;
-    $cname =~ s/-/_/g;
     if (my $action = $carriers{$cname}) {
         $action->($ident);
     } else {
-        bad_usage(reason => "no such carrier $Q{$orig_cname}", show_carriers => 1);
+        bad_usage(reason => "no such carrier $Q{$cname}", show_carriers => 1);
     }
     return;
 }
