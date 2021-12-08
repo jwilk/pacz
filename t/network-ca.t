@@ -36,7 +36,7 @@ while (my ($name, $glob) = each %carrier::) {
 }
 my $var = 'PACZ_NETWORK_TESTING';
 if ($ENV{$var}) {
-    plan tests => scalar %host2ca;
+    plan tests => scalar keys %host2ca;
 } else {
     plan skip_all => "set $var=1 to enable tests that exercise network";
 }
