@@ -194,6 +194,8 @@ sub carrier::allegro
     return;
 }
 
+alias('allegro', qw(allegro.pl));
+
 sub carrier::dpd
 {
     my ($ident) = @_;
@@ -216,6 +218,8 @@ sub carrier::dpd
     say;
     return;
 }
+
+alias('dpd', qw(dpd.com.pl));
 
 sub decode_entities  ## no critic (RequireArgUnpacking)
 {
@@ -249,6 +253,8 @@ sub carrier::gls
     dump_yaml($data);
     return;
 }
+
+alias('gls', qw(gls-group.eu));
 
 sub remove_null_cruft
 {
@@ -301,6 +307,8 @@ sub carrier::inpost
     return;
 }
 
+alias('inpost', qw(inpost.pl));
+
 sub carrier::orlen
 {
     my ($ident) = @_;
@@ -340,7 +348,7 @@ sub carrier::orlen
     return;
 }
 
-alias('orlen', qw(paczkawruchu));
+alias('orlen', qw(orlenpaczka.pl paczkawruchu));
 
 sub carrier::poczta
 {
@@ -399,7 +407,7 @@ sub carrier::poczta
     return;
 }
 
-alias('poczta', qw(poczta-polska));
+alias('poczta', qw(poczta-polska.pl poczta-polska));
 
 sub carrier::pointpack
 {
@@ -422,6 +430,8 @@ sub carrier::pointpack
     return;
 }
 
+alias('pointpack', qw(pointpack.pl));
+
 sub carrier::poltraf
 {
     my ($ident) = @_;
@@ -440,6 +450,8 @@ sub carrier::poltraf
     say;
     return;
 }
+
+alias('poltraf', qw(poltraf.pl));
 
 sub carrier::swiss_post
 {
@@ -487,6 +499,8 @@ sub carrier::swiss_post
     dump_yaml($data);
     return;
 }
+
+alias('swiss-post', qw(post.ch));
 
 my %carriers;
 my @carrier_names;
