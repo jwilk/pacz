@@ -81,7 +81,7 @@ for my $host (sort keys %host2ca) {
     ok($ok, "$host uses $ca");
     if (not $ok) {
         $error //= 'unknown error';
-        diag "$host: $error";
+        diag("$host: $error");
     }
 }
 
