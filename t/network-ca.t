@@ -61,7 +61,6 @@ my %host2thread;
 for my $host (sort keys %host2ca) {
     my $ca = $host2ca{$host};
     if (not defined $ca) {
-        fail("no CA declared for $host");
         next;
     }
     my $cafile = "$cadir/$ca.crt";
@@ -73,6 +72,10 @@ for my $host (sort keys %host2ca) {
 }
 for my $host (sort keys %host2ca) {
     my $ca = $host2ca{$host};
+    if (not defined $ca) {
+        fail("no CA declared for $host");
+        next;
+    }
     my $thread = $host2thread{$host};
     my ($ok, $error) = $thread->join();
     ok($ok, "$host uses $ca");
