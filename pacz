@@ -124,8 +124,8 @@ sub quote
 
 sub quote::TIEHASH
 {
-    my ($self) = @_;
-    return bless {}, $self;
+    my ($class) = @_;
+    return bless {}, $class;
 }
 
 sub quote::FETCH
