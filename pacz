@@ -532,6 +532,11 @@ sub carrier::ups
     $url = "https://www.ups.com/track/api/Track/GetStatus?loc=$locale";
     my $data = urlget($url, $post_data, $request_opts);
     $data = $jp->decode($data);
+    my $status_code = $data->{statusCode};
+    if ($status_code != 200) {
+        my $status = $data->{statusText};
+        die "ups: bad status $Q{$status_code} $Q{$status}";
+    }
     my $details = $data->{trackDetails};
     if (scalar @{$details} != 1) {
         my $n = scalar @{$details};
