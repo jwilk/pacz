@@ -350,6 +350,39 @@ sub carrier::orlen
 
 alias('orlen', qw(orlenpaczka.pl paczkawruchu));
 
+sub carrier::pharmalink
+{
+    my ($ident) = @_;
+    $ident =~ /\A[[:alnum:]]{64}\z/a or
+        fatal('pharmalink bad ID format');
+	useca('Certum_Trusted_Network_CA');
+    my $url = "https://pharmalink.pl/web/sledzenie_www.php?id=$ident";
+    my $html = urlget($url);
+    my $number;
+    if ($html =~ m{\bOgladasz historię listu <b>(\w+)</b>}) {
+        $number = $1;
+    } else {
+        fatal('pharmalink: cannot extract letter number');
+    }
+    print "$number\n";
+    while ($html =~ m{<tr\b[^>]*>(.*?)</tr>}sg) {
+        my $tr = $1;
+        my @line;
+        while ($tr =~ m{<td\b[^>]*>(.*?)</td>}sg) {
+            my $text = $1;
+            $text =~ s/<br>$//;
+            push @line, $text;
+        }
+        {
+            local $LIST_SEPARATOR = "\t";
+            say "@line";
+        }
+    }
+    return;
+}
+
+alias('pharmalink', qw(pharmalink.pl));
+
 sub carrier::poczta
 {
     my ($ident) = @_;
