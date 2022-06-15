@@ -292,17 +292,7 @@ sub carrier::inpost
     my $data = urlget($url);
     $data =~ s/\\u0026amp;/&/g;
     $data = $jp->decode($data);
-    for my $item (@{$data->{tracking_details}}) {
-        if (not defined $item->{agency}) {
-            delete $item->{agency};
-        }
-    }
-    if (not defined $data->{custom_attributes}) {
-        delete $data->{custom_attributes};
-    }
-    if (ref $data->{expected_flow} eq 'ARRAY' and scalar @{$data->{expected_flow}} == 0) {
-        delete $data->{expected_flow};
-    }
+    remove_null_cruft($data);
     dump_yaml($data);
     return;
 }
