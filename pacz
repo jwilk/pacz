@@ -530,7 +530,7 @@ sub carrier::ups
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]+\z/a or
         fatal('ups: bad ID format');
-    useca('COMODO_RSA_Certification_Authority');
+    useca('COMODO_ECC_Certification_Authority');
     my $url = "https://www.ups.com/track?tracknum=$ident&requester=ST/trackdetails";
     urlget($url);
     my $xsrf_token;
