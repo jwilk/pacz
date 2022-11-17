@@ -30,9 +30,9 @@ jobs:
     - name: run perlcritic
       run: |
         perlcritic $(grep -rl '/env perl$' .)
-    - name: install HTTP::CookieJar
+    - name: install deps HTTP::CookieJar
       run:
-        sudo apt-get install libhttp-cookiejar-perl
+        sudo apt-get install libio-socket-ssl-perl libhttp-cookiejar-perl
     - name: run tests
       run: |
         PACZ_NETWORK_TESTING=1 prove -v
