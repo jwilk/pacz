@@ -201,7 +201,7 @@ sub carrier::dpd
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]+\z/a or
         fatal('dpd: bad ID format');
-    useca('Certum_Trusted_Network_CA');
+    useca('DigiCert_Global_Root_G2');
     my $url = 'https://tracktrace.dpd.com.pl/findPackage';
     $_ = urlget($url, ['q', $ident, 'typ', 1]);
     m{<table class="table-track">(.*?)</table>}s
