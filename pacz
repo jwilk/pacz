@@ -313,27 +313,6 @@ sub carrier::orlen
     $data = $jp->decode($data);
     delete $data->{historyHtml};
     delete $data->{full};
-    my $number = $data->{number};
-    $data->{xml} //= {};
-    if (%{$data->{xml}} == 0) {
-        delete $data->{xml};
-    } else {
-        for my $item (@{$data->{xml}->{NewDataSet}->{PackStatus}}) {
-            for my $key (qw(Destination City StreetName Location OpeningHours)) {
-                $data->{$key} = $item->{$key};
-                delete $item->{$key};
-            }
-            for my $key (qw(Attribute Cl_Des Cl_From_Des)) {
-                my $value = $item->{$key};
-                if (ref $value eq 'HASH' and %{$value} == 0) {
-                    delete $item->{$key};
-                }
-            }
-            if ($item->{PackCode} eq $number) {
-                delete $item->{PackCode};
-            }
-        }
-    }
     dump_yaml($data);
     return;
 }
