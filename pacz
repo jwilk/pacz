@@ -313,6 +313,11 @@ sub carrier::orlen
     $data = $jp->decode($data);
     delete $data->{historyHtml};
     delete $data->{full};
+    for my $key (qw(returnTruck truckNo)) {
+        if (exists $data->{$key} and $data->{$key} eq 'Brak danych') {
+            delete $data->{$key};
+        }
+    }
     for my $item (@{$data->{history}}) {
         $item->{date} =~ s/\A(\d{2})-(\d{2})-(\d{4}), (\d{2}:\d{2})\z/$3-$2-$1 $4/;
     }
