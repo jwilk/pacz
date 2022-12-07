@@ -320,6 +320,7 @@ sub carrier::orlen
     }
     for my $item (@{$data->{history}}) {
         $item->{date} =~ s/\A(\d{2})-(\d{2})-(\d{4}), (\d{2}:\d{2})\z/$3-$2-$1 $4/;
+        $item->{label} =~ s/\s+\z//;
     }
     dump_yaml($data);
     return;
