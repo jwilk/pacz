@@ -165,7 +165,7 @@ sub carrier::allegro
     my ($tracking_id) = ($ident =~ m/\b(ALE${x}{12})\b/) or
         fatal('allegro: missing tracking ID');
     useca('DigiCert_Global_Root_CA');
-    $http->agent('Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0');
+    $http->agent('Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0');
     $http->default_headers({
         'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language' => 'en-US,en;q=0.5',
