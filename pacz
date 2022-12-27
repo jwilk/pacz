@@ -11,11 +11,11 @@ use v5.14;
 
 use English qw(-no_match_vars);
 use Getopt::Long ();
-use HTTP::Tiny;
-use JSON::PP;
-use Time::Piece;
+use HTTP::Tiny ();
+use JSON::PP ();
+use Time::Piece ();
 
-use HTTP::CookieJar;
+use HTTP::CookieJar ();
 
 my $prog = $PROGRAM_NAME =~ s{.*/}{}r;
 
