@@ -173,6 +173,7 @@ sub carrier::allegro
     });
     my $url = "https://allegro.pl/przesylka/sledzenie/${order_uuid}?waybillId=${tracking_id}&carrierId=ALLEGRO";
     my $html = urlget($url);
+    my $ok;
     while ($html =~ m{<section\b[^>]*>(.*?)</section>}g) {
         $_ = $1;
         s{</?div\b[^>]*>}{\n}g;
@@ -190,6 +191,10 @@ sub carrier::allegro
         s{\n\n+}{\n}g;
         say;
         say '';
+        $ok = 1;
+    }
+    if (not $ok) {
+        die 'allegro: cannot extract tracking info';
     }
     return;
 }
