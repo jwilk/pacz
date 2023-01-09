@@ -372,7 +372,7 @@ sub carrier::poczta
     $ident =~ /\A[[:alnum:]]+\z/a or
         fatal('poczta: bad ID format');
     useca('Certum_Trusted_Network_CA');
-    my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.0/tracking';
+    my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.1/tracking';
     my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
     $_ = urlget($url);
     m{<div id="widgetTracking" data-urltracking="\Q$api_endpoint\E" data-apikey="([\w+/.=]+)"/>}
