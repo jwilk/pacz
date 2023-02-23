@@ -295,6 +295,7 @@ sub carrier::inpost
     useca('DigiCert_Global_Root_CA');
     my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
     my $data = urlget($url);
+    $data =~ s/\\u0026apos;/'/g;
     $data =~ s/\\u0026amp;/&/g;
     $data = $jp->decode($data);
     remove_null_cruft($data);
