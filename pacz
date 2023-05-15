@@ -339,7 +339,7 @@ sub carrier::pharmalink
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:]]{64}\z/a or
         fatal('pharmalink bad ID format');
-	useca('Certum_Trusted_Network_CA');
+    useca('Certum_Trusted_Network_CA');
     my $url = "https://pharmalink.pl/web/sledzenie_www.php?id=$ident";
     my $html = urlget($url);
     my $number;
