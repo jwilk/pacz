@@ -292,7 +292,7 @@ sub carrier::inpost
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
         fatal('inpost: bad ID format');
-    useca('DigiCert_Global_Root_CA');
+    useca('DigiCert_Global_Root_G2');
     my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
     my $data = urlget($url);
     $data =~ s/\\u0026apos;/'/g;
