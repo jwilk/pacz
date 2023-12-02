@@ -239,7 +239,7 @@ sub carrier::gls
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
         fatal('gls: bad ID format');
-    useca('GlobalSign_Root_CA_-_R3');
+    useca('GlobalSign_Root_CA');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
     my $url = "https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts";
