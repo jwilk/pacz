@@ -66,7 +66,7 @@ for my $host (sort keys %host2ca) {
     my $cafile = "$cadir/$ca.crt";
     stat $cafile or die "$cafile: $ERRNO";
     $host2thread{$host} = threads->create(
-        {list => 1},
+        {context => 'list'},
         \&check_host, $host, $cafile
     );
 }
