@@ -443,11 +443,7 @@ sub carrier::poczta
             delete $descr->{latitude};
             delete $descr->{longitude};
         }
-        # TODO: reorder the address keys:
-        # - street
-        # - houseNumber
-        # - zipCode
-        # - city
+        reorder_keys($descr, qw(street houseNumber zipCode city))
     };
     my $mailinfo = $data->{mailInfo};
     for my $key (keys %{$data}) {
