@@ -27,7 +27,10 @@ my %http_options = (
 );
 my $http = HTTP::Tiny->new(%http_options);
 
-my $jp = JSON::PP->new->utf8->pretty;
+my $jp = JSON::PP->new  ## no critic (LongChainsOfMethodCalls)
+    ->utf8
+    ->pretty
+    ->canonical;
 
 sub useca
 {
