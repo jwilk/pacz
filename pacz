@@ -15,6 +15,7 @@ use HTTP::Tiny ();
 use JSON::PP ();
 use Time::Piece ();
 
+use Net::SSLeay ();
 use HTTP::CookieJar ();
 
 my $prog = $PROGRAM_NAME =~ s{.*/}{}r;
@@ -80,6 +81,44 @@ sub urlget
     return $response->{content};
 }
 
+sub sorting_token
+{
+    my ($sort_key) = @_;
+    state $token = do {
+        my $nbytes = 14;  # 112 bits
+        Net::SSLeay::RAND_bytes(my $bytes, $nbytes);
+        (length $bytes) == $nbytes
+            or die 'RNG failure';
+        unpack 'H*', $bytes;
+    };
+    return ":pacz:$token:$sort_key:";
+}
+
+sub remove_sorting_token
+{
+    local ($_) = @_;
+    my $regexp = sorting_token('[^:]*');
+    s/$regexp//g;
+    return $_;
+}
+
+sub reorder_keys
+{
+    my ($hash, @keys) = @_;
+    (scalar @keys) <= 9
+        or die;
+    my $i = 0;
+    for my $key (@keys) {
+        if (exists $hash->{$key}) {
+            my $value = delete $hash->{$key};
+            my $prefix = sorting_token($i);
+            $hash->{"$prefix$key"} = $value;
+        }
+        $i++;
+    }
+    return;
+}
+
 my $use_yaml = 1;
 
 sub dump_yaml
@@ -100,6 +139,7 @@ sub dump_yaml
     } else {
         $_ = $jp->encode($_);
     }
+    $_ = remove_sorting_token($_);
     print;
     return;
 }
