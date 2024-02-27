@@ -9,9 +9,9 @@ prog="$pdir/pacz"
 echo 1..1
 xout=$(
     < "$pdir/README" \
-    grep '^   [$] pacz --help$' -A999 |
+    grep -A999 '^   [$] pacz --help$' |
     tail -n +2 |
-    grep '^[^ ]' -m1 -B999 |
+    grep -B999 -m1 '^[^ ]' |
     head -n -1 |
     sed -e 's/^   //'
 )
