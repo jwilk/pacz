@@ -15,19 +15,17 @@ use autodie;
 
 my $base = "$FindBin::Bin/..";
 
-my $readme;
 open my $fh, '<', "$base/README";
-{
+my $readme = do {
     local $RS = undef;
-    $readme = <$fh>;
-}
+    <$fh>;
+};
 close $fh;
-my $usage;
 open $fh, '-|', "$base/pacz", '--help';
-{
+my $usage = do {
     local $RS = undef;
-    $usage = <$fh>;
-}
+    <$fh>;
+};
 close $fh;
 $usage =~ s/^(?=.)/   /mg;
 $readme =~ s/\n   \$ pacz --help\n\K.*?(?=\n\S)/$usage/s;
