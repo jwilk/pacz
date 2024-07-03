@@ -335,7 +335,7 @@ sub carrier::inpost
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
         fatal('inpost: bad ID format');
-    useca('Baltimore_CyberTrust_Root');
+    useca('ISRG_Root_X1');
     my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
     my $data = urlget($url);
     $data =~ s/\\u0026apos;/'/g;
