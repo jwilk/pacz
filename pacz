@@ -419,11 +419,12 @@ sub carrier::poczta
     my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.1/tracking';
     my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
     $_ = urlget($url);
-    m{<div id="widgetTracking" data-urltracking="\Q$api_endpoint\E" data-apikey="([\w+/.=]+)"/>}
+    m{<div id="widgetTracking" data-urltracking="\Q$api_endpoint\E" data-apikey="([\w+/.=]+)" +data-lang="(\w+)"/>}
         or die "<$url>: cannot extract API key";
     my $api_key = $1;
+    my $lang = $2;
     $url = "$api_endpoint/checkmailex";
-    my $data = qq({"language":"PL","number":"$ident","addPostOfficeInfo":true});
+    my $data = qq({"language":"$lang","number":"$ident","addPostOfficeInfo":true});
     my $args = {
         headers => {
             'API_KEY' => $api_key,
