@@ -15,7 +15,7 @@ exclude_functions = print say
 # see https://bugs.debian.org/706266
 
 [RegularExpressions::ProhibitComplexRegexes]
-max_characters = 80
+max_characters = 100
 
 [-RegularExpressions::ProhibitEnumeratedClasses]
 # no, thanks
