@@ -336,12 +336,14 @@ sub carrier::inpost
     $ident =~ /\A\d+\z/a or
         fatal('inpost: bad ID format');
     useca('GTS_Root_R4');
-    my $url = "https://api-shipx-pl.easypack24.net/v1/tracking/$ident";
+    $http->default_headers({
+        'X-Requested-With' => 'XMLHttpRequest',
+    });
+    my $url = "https://inpost.pl/shipx-proxy/?number=$ident&new_api=true&language=pl_PL";
     my $data = urlget($url);
     $data =~ s/\\u0026apos;/'/g;
     $data =~ s/\\u0026amp;/&/g;
     $data = $jp->decode($data);
-    remove_null_cruft($data);
     dump_yaml($data);
     return;
 }
