@@ -481,9 +481,6 @@ sub carrier::pointpack
     my $data = urlget($url);
     $data = $jp->decode($data);
     for my $item (@{$data}) {
-        my $date = $item->{date};
-        $date = Time::Piece::localtime($date / 1000);
-        $item->{date} = $date->datetime;
         if (not defined $item->{notes}) {
             delete $item->{notes};
         }
