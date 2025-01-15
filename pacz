@@ -210,6 +210,9 @@ sub carrier::allegro
     my $url = "https://edge.allegro.pl/ad/tracking?packageNo=${ident}";
     my $data = urlget($url);
     $data = $jp->decode($data);
+    my @status = @{$data->{status}};
+    @status = sort { $a->{eventTimestamp} cmp $b->{eventTimestamp} } @status;
+    $data->{status} = [@status];
     dump_yaml($data);
     return;
 }
