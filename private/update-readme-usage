@@ -28,7 +28,8 @@ my $usage = do {
 };
 close $fh;
 $usage =~ s/^(?=.)/   /mg;
-$readme =~ s/\n   \$ pacz --help\n\K.*?(?=\n\S)/$usage/s;
+$readme =~ s/\n   \$ pacz --help\n\K.*?(?=\n\S)/$usage/s
+    or die;
 open $fh, '>', "$base/README";
 {
     print {$fh} $readme;
