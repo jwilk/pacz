@@ -255,15 +255,15 @@ sub decode_entities  ## no critic (RequireArgUnpacking)
 sub carrier::gls
 {
     my ($ident) = @_;
-    $ident =~ /\A\d+\z/a or
-        fatal('gls: bad ID format');
+    $ident =~ /\A\d+@[\d-]+\z/a or
+        fatal('gls: bad ID format; should be NNNNNN@POSTALCODE');
+    ($ident, my $postal_code) = split /@/, $ident;
     useca('DigiCert_Global_Root_G2');
     my $uts = Time::Piece->new->epoch;
     my $ts = "${uts}000";
-    my $url = "https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=$ident&millis=$ts";
+    my $url = "https://gls-group.eu/app/service/open/rest/GROUP/en/rstt028/$ident?caller=witt002&millis=$ts&postalCode=${postal_code}";
     my $data = urlget($url);
     $data = $jp->decode($data);
-    $data = $data->{tuStatus}->[0];
     delete $data->{progressBar};
     for my $history (@{$data->{history}}) {
         decode_entities($history->{evtDscr});
