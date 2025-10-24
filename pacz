@@ -452,7 +452,7 @@ sub carrier::pointpack
     my ($ident) = @_;
     $ident =~ /\A\d+\z/a or
         fatal('pointpack: bad ID format');
-    useca('Certum_Trusted_Network_CA');
+    useca('Sectigo_Public_Server_Authentication_Root_R46');
     my $url = "https://www.pointpack.pl/rest/api/v1/tracking/$ident";
     my $data = urlget($url);
     $data = $jp->decode($data);
