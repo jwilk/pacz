@@ -466,27 +466,6 @@ sub carrier::pointpack
 
 alias('pointpack', qw(pointpack.pl));
 
-sub carrier::poltraf
-{
-    my ($ident) = @_;
-    $ident =~ /\A\d+\z/a or
-        fatal('poltraf: bad ID format');
-    useca('Certum_Trusted_Network_CA');
-    $_ = urlget("https://poltraf.pl/zarzadzanie_przesylkami.html?go=ok&nr_przesylki=$ident");
-    m{<tbody\b[>]*>(.*?)</tbody>}s
-        or die 'poltraf: cannot extract tracking table';
-    $_ = $1;
-    s{\s*</t[dr]>\s*}{}g;
-    s{\s+}{ }g;
-    s{\s*<td>}{\t}g;
-    s{\s*<tr\b[^>]*>\t}{\n}g;
-    s{\A\n+}{};
-    say;
-    return;
-}
-
-alias('poltraf', qw(poltraf.pl));
-
 sub carrier::swiss_post
 {
     my ($ident) = @_;
