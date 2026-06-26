@@ -443,7 +443,7 @@ sub carrier::swiss_post
     my ($ident) = @_;
     $ident =~ /\A[[:alnum:].]+\z/a or
         fatal('swiss-post: bad ID format');
-    useca('SwissSign_Gold_CA_-_G2');
+    useca('SwissSign_Gold_CA_-_G2', 'SwissSign_RSA_TLS_Root_CA_2022_-_1');
     my $response = xurlget('https://service.post.ch/ekp-web/api/user');
     my $data = $response->{content};
     $data = $jp->decode($data);
