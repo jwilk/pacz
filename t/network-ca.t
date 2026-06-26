@@ -20,17 +20,22 @@ use IO::Socket::SSL;
 
 do "$FindBin::Bin/../pacz" or die;
 my %host2ca;
+my $cadir = '/usr/share/ca-certificates/mozilla';
 while (my ($name, $glob) = each %carrier::) {
     $name =~ /\A_/ and next;
     my $code = \&{$glob};
     state $deparse = B::Deparse->new;
     my $body = $deparse->coderef2text($code);
-    my $ca = undef;
-    while ($body =~ m{\buseca[(]'([\w-]+)'[)]|\bhttps://([^/]+)}g) {
+    my $cafile = undef;
+    while ($body =~ m{\buseca[(]([^)]+)[)]|\bhttps://([^/]+)}g) {
         if (defined $1) {
-            $ca = $1;
+            my $cas = $1;
+            for my $ca ($cas =~ m/'([\w-]+)'/g) {
+                $cafile = "$cadir/$ca.crt";
+                last if -f $cafile;
+            }
         } else {
-            $host2ca{$2} = $ca;
+            $host2ca{$2} = $cafile;
         }
     }
 }
@@ -40,7 +45,6 @@ if (grep {$_ eq $opt} @ARGV) {  ## no critic (BooleanGrep)
 } else {
     plan skip_all => "use $opt to enable tests that exercise network";
 }
-my $cadir = '/usr/share/ca-certificates/mozilla';
 sub check_host
 {
     my ($host, $cafile) = @_;
@@ -59,11 +63,10 @@ sub check_host
 }
 my %host2thread;
 for my $host (sort keys %host2ca) {
-    my $ca = $host2ca{$host};
-    if (not defined $ca) {
+    my $cafile = $host2ca{$host};
+    if (not defined $cafile) {
         next;
     }
-    my $cafile = "$cadir/$ca.crt";
     stat $cafile or die "$cafile: $ERRNO";
     $host2thread{$host} = threads->create(
         {context => 'list'},

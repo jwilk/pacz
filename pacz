@@ -35,15 +35,20 @@ my $jp = JSON::PP->new  ## no critic (LongChainsOfMethodCalls)
 
 sub useca
 {
-    my ($ca) = @_;
+    my @cas = @_;
     my $cadir = '/usr/share/ca-certificates/mozilla';
-    my $cafile = "$cadir/$ca.crt";
-    if (-d $cadir) {
-        $http = HTTP::Tiny->new(
-            %http_options,
-            SSL_options => {SSL_ca_file => $cafile}
-        );
+    if (! -d $cadir) {
+        return;
     }
+    my $cafile;
+    for my $ca (@cas) {
+        $cafile = "$cadir/$ca.crt";
+        last if -f $cafile;
+    }
+    $http = HTTP::Tiny->new(
+        %http_options,
+        SSL_options => {SSL_ca_file => $cafile}
+    );
     return;
 }
 
