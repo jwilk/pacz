@@ -37,6 +37,6 @@ jobs:
         sudo apt-get install libio-socket-ssl-perl libhttp-cookiejar-perl
     - name: run tests
       run: |
-        PACZ_NETWORK_TESTING=1 prove -v
+        prove -v '::' --network
 
 # vim:ts=2 sts=2 sw=2 et

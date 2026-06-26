@@ -34,11 +34,11 @@ while (my ($name, $glob) = each %carrier::) {
         }
     }
 }
-my $var = 'PACZ_NETWORK_TESTING';
-if ($ENV{$var}) {
+my $opt = '--network';
+if (grep {$_ eq $opt} @ARGV) {  ## no critic (BooleanGrep)
     plan tests => scalar keys %host2ca;
 } else {
-    plan skip_all => "set $var=1 to enable tests that exercise network";
+    plan skip_all => "use $opt to enable tests that exercise network";
 }
 my $cadir = '/usr/share/ca-certificates/mozilla';
 sub check_host
