@@ -206,7 +206,7 @@ sub alias
 sub carrier::allegro
 {
     my ($ident) = @_;
-    $ident =~ /\AA[0-9A-Z]{9}\z/a or
+    $ident =~ /\AA[0-9A-Z]{9,}\z/a or
         fatal('allegro: bad ID format');
     useca('GlobalSign_Root_CA_-_R3');
     $http->default_headers({
