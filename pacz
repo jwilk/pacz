@@ -366,7 +366,7 @@ sub carrier::poczta
     my $url = "https://emonitoring.poczta-polska.pl/?numer=$ident";
     $_ = urlget($url);
     useca('Certum_Trusted_Root_CA');
-    my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v1.1/tracking';
+    my $api_endpoint = 'https://uss.poczta-polska.pl/uss/v2.0/tracking';
     m{<div id="widgetTracking" data-urltracking="\Q$api_endpoint\E" data-apikey="([\w+/.=]+)" +data-lang="(\w+)"/>}
         or die "<$url>: cannot extract API key";
     my $api_key = $1;
